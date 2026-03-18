@@ -10,14 +10,7 @@
 	<div class="container">
 		<div class="top-content">
 			<h1>Linea Temporale</h1>
-			<p class="subtitle">Aggiungi data, testo e immagine. Le modifiche restano nel browser e puoi esportare/importare un file JSON.</p>
-
-			<div class="toolbar top-toolbar">
-				<button type="button" class="muted" id="themeToggleBtn">Tema: Dark</button>
-				<button type="button" class="danger" id="resetAllBtn">Svuota tutto</button>
-			</div>
-
-			<p class="status" id="statusMsg"></p>
+			<p class="subtitle">Crea la tua linea temporale personalizzata</p>
 		</div>
 
 		<section class="card timeline-section">
@@ -28,11 +21,36 @@
 
 	<div class="fab-stack">
 		<button type="button" class="fab-add" id="openFormBtn" aria-label="Aggiungi nuovo evento">+</button>
-		<button type="button" class="fab-backup" id="backupMenuBtn" aria-label="Backup" title="Backup">⤓</button>
-		<div class="backup-menu hidden" id="backupMenu" role="menu" aria-label="Menu backup">
-			<button type="button" class="secondary" id="downloadBtn" role="menuitem">Scarica</button>
-			<button type="button" class="secondary" id="uploadBtn" role="menuitem">Importa</button>
+		<div class="backup-wrap">
+			<button type="button" class="fab-backup" id="backupMenuBtn" aria-label="Backup" title="Backup">
+				<svg class="backup-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+					<path d="M12 3v10"></path>
+					<path d="M8 10l4 4 4-4"></path>
+					<path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"></path>
+				</svg>
+			</button>
+			<div class="backup-menu hidden" id="backupMenu" role="menu" aria-label="Menu backup">
+				<button type="button" class="secondary" id="downloadBtn" role="menuitem">Scarica</button>
+				<button type="button" class="secondary" id="uploadBtn" role="menuitem">Importa</button>
+			</div>
 		</div>
+		<button type="button" class="fab-fullscreen" id="fullscreenBtn" aria-label="Attiva schermo intero" title="Attiva schermo intero">
+			<svg class="fullscreen-icon" id="fullscreenEnterIcon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+				<path d="M8 3H3v5M16 3h5v5M21 16v5h-5M3 16v5h5"></path>
+			</svg>
+			<svg class="fullscreen-icon hidden" id="fullscreenExitIcon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+				<path d="M9 3H3v6M15 3h6v6M21 15v6h-6M3 15v6h6"></path>
+			</svg>
+		</button>
+		<button type="button" class="fab-theme" id="themeToggleBtn" aria-label="Tema scuro" title="Tema scuro">
+			<svg class="theme-icon theme-icon-moon" id="themeMoonIcon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+				<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 1 0 9.8 9.8z"></path>
+			</svg>
+			<svg class="theme-icon theme-icon-sun hidden" id="themeSunIcon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+				<circle cx="12" cy="12" r="4"></circle>
+				<path d="M12 2v2.5M12 19.5V22M4.93 4.93l1.77 1.77M17.3 17.3l1.77 1.77M2 12h2.5M19.5 12H22M4.93 19.07l1.77-1.77M17.3 6.7l1.77-1.77"></path>
+			</svg>
+		</button>
 		<input id="uploadInput" class="hidden" type="file" accept="application/json">
 	</div>
 
@@ -84,13 +102,16 @@
 		const eventImageInput = document.getElementById('eventImage');
 		const clearFormBtn = document.getElementById('clearFormBtn');
 		const saveEventBtn = document.getElementById('saveEventBtn');
-		const resetAllBtn = document.getElementById('resetAllBtn');
+		const fullscreenBtn = document.getElementById('fullscreenBtn');
+		const fullscreenEnterIcon = document.getElementById('fullscreenEnterIcon');
+		const fullscreenExitIcon = document.getElementById('fullscreenExitIcon');
 		const themeToggleBtn = document.getElementById('themeToggleBtn');
+		const themeMoonIcon = document.getElementById('themeMoonIcon');
+		const themeSunIcon = document.getElementById('themeSunIcon');
 		const downloadBtn = document.getElementById('downloadBtn');
 		const uploadBtn = document.getElementById('uploadBtn');
 		const uploadInput = document.getElementById('uploadInput');
 		const timelineEl = document.getElementById('timeline');
-		const statusMsg = document.getElementById('statusMsg');
 		const openFormBtn = document.getElementById('openFormBtn');
 		const backupMenuBtn = document.getElementById('backupMenuBtn');
 		const backupMenu = document.getElementById('backupMenu');
@@ -105,7 +126,11 @@
 		function applyTheme(theme) {
 			currentTheme = theme === 'dark' ? 'dark' : 'light';
 			document.body.classList.toggle('theme-dark', currentTheme === 'dark');
-			themeToggleBtn.textContent = currentTheme === 'dark' ? 'Tema: White' : 'Tema: Dark';
+			const isDark = currentTheme === 'dark';
+			themeMoonIcon.classList.toggle('hidden', isDark);
+			themeSunIcon.classList.toggle('hidden', !isDark);
+			themeToggleBtn.title = isDark ? 'Tema chiaro' : 'Tema scuro';
+			themeToggleBtn.setAttribute('aria-label', isDark ? 'Passa al tema chiaro' : 'Passa al tema scuro');
 		}
 
 		function loadTheme() {
@@ -118,9 +143,17 @@
 			return prefersDark ? 'dark' : 'light';
 		}
 
-		function showStatus(message, isError = false) {
-			statusMsg.textContent = message;
-			statusMsg.style.color = isError ? 'var(--status-error)' : 'var(--status-success)';
+		function showStatus() {
+			return;
+		}
+
+		function updateFullscreenState() {
+			const isFullscreen = Boolean(document.fullscreenElement);
+			document.body.classList.toggle('presentation-mode', isFullscreen);
+			fullscreenEnterIcon.classList.toggle('hidden', isFullscreen);
+			fullscreenExitIcon.classList.toggle('hidden', !isFullscreen);
+			fullscreenBtn.title = isFullscreen ? 'Esci da schermo intero' : 'Attiva schermo intero';
+			fullscreenBtn.setAttribute('aria-label', isFullscreen ? 'Esci da schermo intero' : 'Attiva schermo intero');
 		}
 
 		function formatDate(isoDate) {
@@ -392,6 +425,21 @@
 			localStorage.setItem(THEME_KEY, nextTheme);
 		});
 
+		fullscreenBtn.addEventListener('click', async () => {
+			closeBackupMenu();
+			try {
+				if (!document.fullscreenElement) {
+					await document.documentElement.requestFullscreen();
+				} else {
+					await document.exitFullscreen();
+				}
+			} catch (error) {
+				console.error('Errore modalità schermo intero:', error);
+			}
+		});
+
+		document.addEventListener('fullscreenchange', updateFullscreenState);
+
 		closeModalBtn.addEventListener('click', closeModal);
 		modalBackdrop.addEventListener('click', closeModal);
 
@@ -448,19 +496,6 @@
 				resetForm();
 				showStatus('Evento eliminato.');
 			}
-		});
-
-		resetAllBtn.addEventListener('click', async () => {
-			const confirmReset = window.confirm('Vuoi eliminare tutti gli eventi?');
-			if (!confirmReset) {
-				return;
-			}
-
-			timelineData = [];
-			resetForm();
-			await saveToLocal();
-			renderTimeline();
-			showStatus('Timeline svuotata.');
 		});
 
 		downloadBtn.addEventListener('click', () => {
@@ -521,6 +556,7 @@
 
 		(async function init() {
 			applyTheme(loadTheme());
+			updateFullscreenState();
 			await loadFromLocal();
 			renderTimeline();
 			showStatus('Pronto. I dati vengono salvati nel browser.');
