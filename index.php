@@ -8,17 +8,17 @@
 </head>
 <body>
 	<div class="container">
-		<h1>Linea Temporale</h1>
-		<p class="subtitle">Aggiungi data, testo e immagine. Le modifiche restano nel browser e puoi esportare/importare un file JSON.</p>
+		<div class="top-content">
+			<h1>Linea Temporale</h1>
+			<p class="subtitle">Aggiungi data, testo e immagine. Le modifiche restano nel browser e puoi esportare/importare un file JSON.</p>
 
-		<div class="toolbar top-toolbar">
-			<button type="button" class="secondary" id="downloadBtn">Scarica file JSON</button>
-			<label class="button-like secondary" for="uploadInput">Carica file JSON</label>
-			<input id="uploadInput" class="hidden" type="file" accept="application/json">
-			<button type="button" class="danger" id="resetAllBtn">Svuota tutto</button>
+			<div class="toolbar top-toolbar">
+				<button type="button" class="muted" id="themeToggleBtn">Tema: Dark</button>
+				<button type="button" class="danger" id="resetAllBtn">Svuota tutto</button>
+			</div>
+
+			<p class="status" id="statusMsg"></p>
 		</div>
-
-		<p class="status" id="statusMsg"></p>
 
 		<section class="card timeline-section">
 			<h2>Timeline</h2>
@@ -26,7 +26,15 @@
 		</section>
 	</div>
 
-	<button type="button" class="fab-add" id="openFormBtn" aria-label="Aggiungi nuovo evento">+</button>
+	<div class="fab-stack">
+		<button type="button" class="fab-add" id="openFormBtn" aria-label="Aggiungi nuovo evento">+</button>
+		<button type="button" class="fab-backup" id="backupMenuBtn" aria-label="Backup" title="Backup">⤓</button>
+		<div class="backup-menu hidden" id="backupMenu" role="menu" aria-label="Menu backup">
+			<button type="button" class="secondary" id="downloadBtn" role="menuitem">Scarica</button>
+			<button type="button" class="secondary" id="uploadBtn" role="menuitem">Importa</button>
+		</div>
+		<input id="uploadInput" class="hidden" type="file" accept="application/json">
+	</div>
 
 	<div class="modal hidden" id="eventModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
 		<div class="modal-backdrop" id="modalBackdrop"></div>
@@ -61,8 +69,12 @@
 
 	<script>
 		const STORAGE_KEY = 'timeline_app_data_v1';
+		const THEME_KEY = 'timeline_theme_v1';
 		const CACHE_NAME = 'timeline_app_cache_v1';
 		const CACHE_URL = '/timeline-data.json';
+		const IMAGE_MAX_WIDTH = 1600;
+		const IMAGE_MAX_HEIGHT = 1600;
+		const IMAGE_QUALITY = 0.8;
 
 		const eventForm = document.getElementById('eventForm');
 		const editIndexInput = document.getElementById('editIndex');
@@ -73,21 +85,42 @@
 		const clearFormBtn = document.getElementById('clearFormBtn');
 		const saveEventBtn = document.getElementById('saveEventBtn');
 		const resetAllBtn = document.getElementById('resetAllBtn');
+		const themeToggleBtn = document.getElementById('themeToggleBtn');
 		const downloadBtn = document.getElementById('downloadBtn');
+		const uploadBtn = document.getElementById('uploadBtn');
 		const uploadInput = document.getElementById('uploadInput');
 		const timelineEl = document.getElementById('timeline');
 		const statusMsg = document.getElementById('statusMsg');
 		const openFormBtn = document.getElementById('openFormBtn');
+		const backupMenuBtn = document.getElementById('backupMenuBtn');
+		const backupMenu = document.getElementById('backupMenu');
 		const eventModal = document.getElementById('eventModal');
 		const closeModalBtn = document.getElementById('closeModalBtn');
 		const modalBackdrop = document.getElementById('modalBackdrop');
 		const modalTitle = document.getElementById('modalTitle');
 
 		let timelineData = [];
+		let currentTheme = 'light';
+
+		function applyTheme(theme) {
+			currentTheme = theme === 'dark' ? 'dark' : 'light';
+			document.body.classList.toggle('theme-dark', currentTheme === 'dark');
+			themeToggleBtn.textContent = currentTheme === 'dark' ? 'Tema: White' : 'Tema: Dark';
+		}
+
+		function loadTheme() {
+			const savedTheme = localStorage.getItem(THEME_KEY);
+			if (savedTheme === 'light' || savedTheme === 'dark') {
+				return savedTheme;
+			}
+
+			const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+			return prefersDark ? 'dark' : 'light';
+		}
 
 		function showStatus(message, isError = false) {
 			statusMsg.textContent = message;
-			statusMsg.style.color = isError ? '#991b1b' : '#065f46';
+			statusMsg.style.color = isError ? 'var(--status-error)' : 'var(--status-success)';
 		}
 
 		function formatDate(isoDate) {
@@ -222,12 +255,61 @@
 			document.body.classList.remove('modal-open');
 		}
 
+		function toggleBackupMenu() {
+			backupMenu.classList.toggle('hidden');
+		}
+
+		function closeBackupMenu() {
+			backupMenu.classList.add('hidden');
+		}
+
 		function fileToDataUrl(file) {
 			return new Promise((resolve, reject) => {
 				const reader = new FileReader();
 				reader.onload = () => resolve(reader.result);
 				reader.onerror = () => reject(new Error('Impossibile leggere il file immagine.'));
 				reader.readAsDataURL(file);
+			});
+		}
+
+		async function fileToCompressedDataUrl(file) {
+			if (!file.type.startsWith('image/')) {
+				throw new Error('Il file selezionato non è un\'immagine valida.');
+			}
+
+			const sourceDataUrl = await fileToDataUrl(file);
+
+			return new Promise((resolve) => {
+				const image = new Image();
+
+				image.onload = () => {
+					const scale = Math.min(
+						1,
+						IMAGE_MAX_WIDTH / image.naturalWidth,
+						IMAGE_MAX_HEIGHT / image.naturalHeight
+					);
+
+					const targetWidth = Math.max(1, Math.round(image.naturalWidth * scale));
+					const targetHeight = Math.max(1, Math.round(image.naturalHeight * scale));
+
+					const canvas = document.createElement('canvas');
+					canvas.width = targetWidth;
+					canvas.height = targetHeight;
+
+					const context = canvas.getContext('2d');
+					if (!context) {
+						resolve(sourceDataUrl);
+						return;
+					}
+
+					context.drawImage(image, 0, 0, targetWidth, targetHeight);
+
+					const compressedDataUrl = canvas.toDataURL('image/webp', IMAGE_QUALITY);
+					resolve(compressedDataUrl.length < sourceDataUrl.length ? compressedDataUrl : sourceDataUrl);
+				};
+
+				image.onerror = () => resolve(sourceDataUrl);
+				image.src = sourceDataUrl;
 			});
 		}
 
@@ -248,7 +330,7 @@
 
 			if (eventImageInput.files[0]) {
 				try {
-					imageData = await fileToDataUrl(eventImageInput.files[0]);
+					imageData = await fileToCompressedDataUrl(eventImageInput.files[0]);
 				} catch (error) {
 					showStatus(error.message, true);
 					return;
@@ -290,7 +372,24 @@
 		openFormBtn.addEventListener('click', () => {
 			resetForm();
 			openModal();
+			closeBackupMenu();
 			showStatus('Inserisci i dati del nuovo evento.');
+		});
+
+		backupMenuBtn.addEventListener('click', (event) => {
+			event.stopPropagation();
+			toggleBackupMenu();
+		});
+
+		uploadBtn.addEventListener('click', () => {
+			closeBackupMenu();
+			uploadInput.click();
+		});
+
+		themeToggleBtn.addEventListener('click', () => {
+			const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+			applyTheme(nextTheme);
+			localStorage.setItem(THEME_KEY, nextTheme);
 		});
 
 		closeModalBtn.addEventListener('click', closeModal);
@@ -299,6 +398,20 @@
 		document.addEventListener('keydown', (event) => {
 			if (event.key === 'Escape' && !eventModal.classList.contains('hidden')) {
 				closeModal();
+			}
+
+			if (event.key === 'Escape') {
+				closeBackupMenu();
+			}
+		});
+
+		document.addEventListener('click', (event) => {
+			if (!(event.target instanceof HTMLElement)) {
+				return;
+			}
+
+			if (!backupMenu.contains(event.target) && event.target !== backupMenuBtn) {
+				closeBackupMenu();
 			}
 		});
 
@@ -351,6 +464,7 @@
 		});
 
 		downloadBtn.addEventListener('click', () => {
+			closeBackupMenu();
 			const payload = {
 				exportedAt: new Date().toISOString(),
 				version: 1,
@@ -406,6 +520,7 @@
 		});
 
 		(async function init() {
+			applyTheme(loadTheme());
 			await loadFromLocal();
 			renderTimeline();
 			showStatus('Pronto. I dati vengono salvati nel browser.');
