@@ -9,6 +9,7 @@
 
 body {
   margin: 0;
+  min-height: 100dvh;
   background: #f6f7fb;
   color: #1f2937;
 }
@@ -21,7 +22,11 @@ body.modal-open {
   max-width: none;
   width: 100%;
   margin: 0;
+  min-height: 100dvh;
+  box-sizing: border-box;
   padding: 24px 28px 90px;
+  display: flex;
+  flex-direction: column;
 }
 
 .top-content {
@@ -133,16 +138,72 @@ button,
   padding: 38px 0 4px;
   display: flex;
   gap: 14px;
+  flex: 1;
+  min-height: 300px;
   overflow-x: auto;
-  align-items: stretch;
+  align-items: flex-start;
   scroll-snap-type: x proximity;
+}
+
+.timeline-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.timeline-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+}
+
+.timeline-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 4px;
+  min-width: 0;
+}
+
+.timeline-header h2 {
+  margin: 0;
+}
+
+.timeline-title-edit {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  flex: 0 0 auto;
+  margin-left: 0;
+}
+
+.timeline-zoom-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.timeline-zoom-btn {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.timeline-zoom-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
 }
 
 .timeline::before {
   content: "";
   position: absolute;
   left: 0;
-  right: 0;
+  right: auto;
+  width: var(--timeline-line-width, 100%);
   top: 22px;
   height: 2px;
   border-radius: 99px;
@@ -150,16 +211,52 @@ button,
 }
 
 .timeline-item {
+  --timeline-item-width: clamp(230px, 24vw, 360px);
   position: relative;
   background: #fff;
   border: none;
   border-radius: 10px;
   padding: 12px;
-  min-width: clamp(320px, 34vw, 520px);
-  max-width: clamp(320px, 34vw, 520px);
+  width: var(--timeline-item-width);
+  min-width: var(--timeline-item-width);
+  max-width: var(--timeline-item-width);
+  flex: 0 0 var(--timeline-item-width);
   margin-bottom: 0;
   margin-top: 8px;
   scroll-snap-align: start;
+  overflow: visible;
+  transition:
+    width 220ms ease,
+    flex-basis 220ms ease,
+    min-width 220ms ease,
+    max-width 220ms ease,
+    padding 220ms ease,
+    background-color 220ms ease;
+}
+
+.timeline-item-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-height: 1600px;
+  opacity: 1;
+  overflow: hidden;
+  transition:
+    opacity 180ms ease,
+    max-height 220ms ease;
+}
+
+.timeline-item.timeline-item-collapsed {
+  --timeline-item-width: 54px;
+  min-height: 0;
+  padding: 0;
+  background: transparent;
+}
+
+.timeline-item.timeline-item-collapsed .timeline-item-content {
+  opacity: 0;
+  max-height: 0;
+  pointer-events: none;
 }
 
 .timeline-item::before {
@@ -195,12 +292,18 @@ button,
 }
 
 .timeline-image {
+  display: block;
   margin-top: 10px;
+  margin-left: 0;
+  margin-right: auto;
+  width: auto;
+  height: auto;
   max-width: 100%;
-  max-height: 260px;
+  max-height: clamp(220px, 42dvh, 520px);
   border-radius: 8px;
   border: none;
-  object-fit: cover;
+  object-fit: contain;
+  align-self: flex-start;
 }
 
 .item-actions {
@@ -489,11 +592,49 @@ body.presentation-mode .top-toolbar {
 }
 
 body.presentation-mode .container {
-  padding: 8px 12px;
+  padding: 12px 20px;
+  justify-content: center;
 }
 
 body.presentation-mode .top-content {
-  margin-bottom: 4px;
+  display: none;
+}
+
+body.presentation-mode .timeline-title-edit {
+  display: none;
+}
+
+body.presentation-mode .timeline-header {
+  padding-top: 10px;
+  padding-bottom: 12px;
+}
+
+body.presentation-mode .timeline-section {
+  width: min(100%, 1800px);
+  min-height: clamp(460px, 80dvh, 980px);
+  margin: 0 auto;
+}
+
+body.presentation-mode .timeline {
+  min-height: clamp(420px, 74dvh, 920px);
+  align-items: stretch;
+  gap: 18px;
+}
+
+body.presentation-mode .timeline-item {
+  --timeline-item-width: clamp(250px, 21vw, 340px);
+  min-height: clamp(320px, 66dvh, 860px);
+  display: flex;
+  flex-direction: column;
+}
+
+body.presentation-mode .timeline-item.timeline-item-collapsed {
+  --timeline-item-width: 54px;
+  min-height: 0;
+}
+
+body.presentation-mode .timeline-text {
+  flex: 1;
 }
 
 @media (max-width: 900px) {
@@ -503,6 +644,10 @@ body.presentation-mode .top-content {
 
   .container {
     padding: 12px 0 84px;
+  }
+
+  .timeline-section {
+    min-height: calc(100dvh - 180px);
   }
 
   .card {
@@ -517,19 +662,27 @@ body.presentation-mode .top-content {
     box-shadow: none;
   }
 
+  .timeline-header {
+    padding: 12px 10px 0;
+  }
+
+  .timeline-topbar {
+    padding-right: 10px;
+  }
+
   .timeline-section h2 {
     margin: 0;
-    padding: 12px 10px 0;
+    padding: 0;
   }
 
   .timeline {
     padding: 38px 10px 12px;
     gap: 10px;
+    min-height: 240px;
   }
 
   .timeline-item {
-    min-width: calc(100vw - 20px);
-    max-width: calc(100vw - 20px);
+    --timeline-item-width: calc(100vw - 20px);
   }
 
   .fab-add {

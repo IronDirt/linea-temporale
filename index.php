@@ -14,7 +14,16 @@
 		</div>
 
 		<section class="card timeline-section">
-			<h2>Timeline</h2>
+			<div class="timeline-topbar">
+				<div class="timeline-header">
+					<h2 id="timelineTitle">Timeline</h2>
+					<button type="button" class="muted timeline-title-edit" id="editTimelineTitleBtn" aria-label="Modifica titolo timeline" title="Modifica titolo">✎</button>
+				</div>
+				<div class="timeline-zoom-controls" aria-label="Controlli zoom timeline">
+					<button type="button" class="muted timeline-zoom-btn" id="zoomOutBtn" aria-label="Riduci dettagli timeline" title="Riduci dettagli">−</button>
+					<button type="button" class="muted timeline-zoom-btn" id="zoomInBtn" aria-label="Aumenta dettagli timeline" title="Aumenta dettagli">+</button>
+				</div>
+			</div>
 			<div id="timeline" class="timeline"></div>
 		</section>
 	</div>
@@ -88,6 +97,7 @@
 	<script>
 		const STORAGE_KEY = 'timeline_app_data_v1';
 		const THEME_KEY = 'timeline_theme_v1';
+		const TIMELINE_TITLE_KEY = 'timeline_title_v1';
 		const CACHE_NAME = 'timeline_app_cache_v1';
 		const CACHE_URL = '/timeline-data.json';
 		const IMAGE_MAX_WIDTH = 1600;
@@ -112,6 +122,10 @@
 		const uploadBtn = document.getElementById('uploadBtn');
 		const uploadInput = document.getElementById('uploadInput');
 		const timelineEl = document.getElementById('timeline');
+		const timelineTitleEl = document.getElementById('timelineTitle');
+		const editTimelineTitleBtn = document.getElementById('editTimelineTitleBtn');
+		const zoomOutBtn = document.getElementById('zoomOutBtn');
+		const zoomInBtn = document.getElementById('zoomInBtn');
 		const openFormBtn = document.getElementById('openFormBtn');
 		const backupMenuBtn = document.getElementById('backupMenuBtn');
 		const backupMenu = document.getElementById('backupMenu');
@@ -122,6 +136,98 @@
 
 		let timelineData = [];
 		let currentTheme = 'light';
+		let zoomLevel = 0;
+
+		function getTimelineAnchor() {
+			const items = timelineEl.querySelectorAll('.timeline-item');
+			if (!items.length) {
+				return null;
+			}
+
+			const viewportCenterX = timelineEl.scrollLeft + (timelineEl.clientWidth / 2);
+			let nearestItem = items[0];
+			let nearestDistance = Number.POSITIVE_INFINITY;
+
+			items.forEach((item) => {
+				const itemCenterX = item.offsetLeft + (item.offsetWidth / 2);
+				const distance = Math.abs(itemCenterX - viewportCenterX);
+				if (distance < nearestDistance) {
+					nearestDistance = distance;
+					nearestItem = item;
+				}
+			});
+
+			const itemWidth = Math.max(1, nearestItem.offsetWidth);
+			const relativeCenter = (viewportCenterX - nearestItem.offsetLeft) / itemWidth;
+
+			return {
+				eventId: nearestItem.dataset.eventId || '',
+				relativeCenter
+			};
+		}
+
+		function restoreTimelineAnchor(anchor, smooth = true) {
+			if (!anchor || !anchor.eventId) {
+				return;
+			}
+
+			window.requestAnimationFrame(() => {
+				const anchorItem = Array.from(timelineEl.querySelectorAll('.timeline-item'))
+					.find((item) => item.dataset.eventId === anchor.eventId);
+
+				if (!anchorItem) {
+					return;
+				}
+
+				const itemWidth = Math.max(1, anchorItem.offsetWidth);
+				const targetCenterX = anchorItem.offsetLeft + (itemWidth * anchor.relativeCenter);
+				const maxScrollLeft = Math.max(0, timelineEl.scrollWidth - timelineEl.clientWidth);
+				const targetScrollLeft = Math.min(
+					maxScrollLeft,
+					Math.max(0, targetCenterX - (timelineEl.clientWidth / 2))
+				);
+
+				timelineEl.scrollTo({
+					left: targetScrollLeft,
+					behavior: smooth ? 'smooth' : 'auto'
+				});
+			});
+		}
+
+		function applyZoomToTimeline(options = {}) {
+			const { preserveFocus = false, smooth = true } = options;
+			const items = timelineEl.querySelectorAll('.timeline-item');
+
+			if (!items.length) {
+				updateZoomButtons();
+				updateTimelineLineWidth();
+				return;
+			}
+
+			const anchor = preserveFocus ? getTimelineAnchor() : null;
+			const visibilityStep = zoomLevel + 1;
+			const lastIndex = items.length - 1;
+
+			items.forEach((item, sortedIndex) => {
+				const isEdgeItem = sortedIndex === 0 || sortedIndex === lastIndex;
+				const isCollapsed = zoomLevel > 0 && !isEdgeItem && (sortedIndex % visibilityStep) !== 0;
+				item.classList.toggle('timeline-item-collapsed', isCollapsed);
+			});
+
+			updateZoomButtons();
+			updateTimelineLineWidth();
+
+			if (anchor) {
+				restoreTimelineAnchor(anchor, smooth);
+			}
+		}
+
+		function updateZoomButtons() {
+			const hasItems = timelineData.length > 0;
+			const maxZoomLevel = hasItems ? Math.max(0, timelineData.length - 1) : 0;
+			zoomInBtn.disabled = zoomLevel <= 0;
+			zoomOutBtn.disabled = !hasItems || zoomLevel >= maxZoomLevel;
+		}
 
 		function applyTheme(theme) {
 			currentTheme = theme === 'dark' ? 'dark' : 'light';
@@ -147,6 +253,21 @@
 			return;
 		}
 
+		function loadTimelineTitle() {
+			const savedTitle = localStorage.getItem(TIMELINE_TITLE_KEY);
+			if (!savedTitle || !savedTitle.trim()) {
+				return 'Timeline';
+			}
+
+			return savedTitle.trim();
+		}
+
+		function setTimelineTitle(title) {
+			const normalizedTitle = title && title.trim() ? title.trim() : 'Timeline';
+			timelineTitleEl.textContent = normalizedTitle;
+			localStorage.setItem(TIMELINE_TITLE_KEY, normalizedTitle);
+		}
+
 		function updateFullscreenState() {
 			const isFullscreen = Boolean(document.fullscreenElement);
 			document.body.classList.toggle('presentation-mode', isFullscreen);
@@ -154,6 +275,18 @@
 			fullscreenExitIcon.classList.toggle('hidden', !isFullscreen);
 			fullscreenBtn.title = isFullscreen ? 'Esci da schermo intero' : 'Attiva schermo intero';
 			fullscreenBtn.setAttribute('aria-label', isFullscreen ? 'Esci da schermo intero' : 'Attiva schermo intero');
+		}
+
+		function updateTimelineLineWidth() {
+			window.requestAnimationFrame(() => {
+				const items = timelineEl.querySelectorAll('.timeline-item');
+				const lastItem = items[items.length - 1];
+				const lastDotX = lastItem
+					? lastItem.offsetLeft + 20 + 5
+					: timelineEl.clientWidth;
+				const lineWidth = Math.max(lastDotX, timelineEl.scrollWidth, timelineEl.clientWidth);
+				timelineEl.style.setProperty('--timeline-line-width', `${lineWidth}px`);
+			});
 		}
 
 		function formatDate(isoDate) {
@@ -174,10 +307,14 @@
 		function renderTimeline() {
 			if (!timelineData.length) {
 				timelineEl.innerHTML = '<p class="empty">Nessun evento inserito.</p>';
+				updateZoomButtons();
+				updateTimelineLineWidth();
 				return;
 			}
 
 			const sorted = [...timelineData].sort((a, b) => a.date.localeCompare(b.date));
+			const maxZoomLevel = Math.max(0, sorted.length - 1);
+			zoomLevel = Math.min(zoomLevel, maxZoomLevel);
 			timelineEl.innerHTML = '';
 
 			sorted.forEach((eventItem) => {
@@ -185,24 +322,29 @@
 
 				const item = document.createElement('article');
 				item.className = 'timeline-item';
+				item.dataset.eventId = eventItem.id;
 
 				const imageBlock = eventItem.imageData
 					? `<img class="timeline-image" src="${eventItem.imageData}" alt="${escapeHtml(eventItem.title)}">`
 					: '';
 
 				item.innerHTML = `
-					<div class="timeline-date">${formatDate(eventItem.date)}</div>
-					<h3 class="timeline-title">${escapeHtml(eventItem.title)}</h3>
-					${imageBlock}
-					<p class="timeline-text">${escapeHtml(eventItem.text)}</p>
-					<div class="item-actions">
-						<button type="button" class="secondary" data-action="edit" data-index="${originalIndex}">Modifica</button>
-						<button type="button" class="danger" data-action="delete" data-index="${originalIndex}">Elimina</button>
+					<div class="timeline-item-content">
+						<div class="timeline-date">${formatDate(eventItem.date)}</div>
+						<h3 class="timeline-title">${escapeHtml(eventItem.title)}</h3>
+						${imageBlock}
+						<p class="timeline-text">${escapeHtml(eventItem.text)}</p>
+						<div class="item-actions">
+							<button type="button" class="secondary" data-action="edit" data-index="${originalIndex}">Modifica</button>
+							<button type="button" class="danger" data-action="delete" data-index="${originalIndex}">Elimina</button>
+						</div>
 					</div>
 				`;
 
 				timelineEl.appendChild(item);
 			});
+
+			applyZoomToTimeline({ preserveFocus: false, smooth: false });
 		}
 
 		function escapeHtml(text) {
@@ -425,6 +567,30 @@
 			localStorage.setItem(THEME_KEY, nextTheme);
 		});
 
+		zoomOutBtn.addEventListener('click', () => {
+			if (!timelineData.length) {
+				return;
+			}
+			zoomLevel = Math.min(zoomLevel + 1, timelineData.length - 1);
+			applyZoomToTimeline({ preserveFocus: true, smooth: true });
+		});
+
+		zoomInBtn.addEventListener('click', () => {
+			zoomLevel = Math.max(zoomLevel - 1, 0);
+			applyZoomToTimeline({ preserveFocus: true, smooth: true });
+		});
+
+		editTimelineTitleBtn.addEventListener('click', () => {
+			const currentTitle = timelineTitleEl.textContent.trim() || 'Timeline';
+			const nextTitle = window.prompt('Inserisci il titolo della timeline', currentTitle);
+
+			if (nextTitle === null) {
+				return;
+			}
+
+			setTimelineTitle(nextTitle);
+		});
+
 		fullscreenBtn.addEventListener('click', async () => {
 			closeBackupMenu();
 			try {
@@ -439,6 +605,7 @@
 		});
 
 		document.addEventListener('fullscreenchange', updateFullscreenState);
+		window.addEventListener('resize', updateTimelineLineWidth);
 
 		closeModalBtn.addEventListener('click', closeModal);
 		modalBackdrop.addEventListener('click', closeModal);
@@ -557,8 +724,10 @@
 		(async function init() {
 			applyTheme(loadTheme());
 			updateFullscreenState();
+			setTimelineTitle(loadTimelineTitle());
 			await loadFromLocal();
 			renderTimeline();
+			updateTimelineLineWidth();
 			showStatus('Pronto. I dati vengono salvati nel browser.');
 		})();
 	</script>
