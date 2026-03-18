@@ -288,7 +288,9 @@ button,
   left: 0;
   right: auto;
   width: var(--timeline-line-width, 100%);
-  top: calc(var(--timeline-top-padding) - 21px + (var(--timeline-dot-size, 10px) / 2));
+  top: calc(
+    var(--timeline-top-padding) - 21px + (var(--timeline-dot-size, 10px) / 2)
+  );
   height: 2px;
   border-radius: 99px;
   background: #dbeafe;
@@ -332,7 +334,9 @@ button,
 
 .timeline-item.timeline-item-collapsed {
   --timeline-item-width: var(--timeline-collapsed-item-width, 54px);
-  --timeline-dot-left: calc((var(--timeline-item-width) - var(--timeline-dot-size, 10px)) / 2);
+  --timeline-dot-left: calc(
+    (var(--timeline-item-width) - var(--timeline-dot-size, 10px)) / 2
+  );
   min-height: 0;
   padding: 0;
   background: transparent;
@@ -365,7 +369,9 @@ button,
 
 .timeline-pin-btn {
   position: absolute;
-  left: calc(var(--timeline-dot-left, 20px) + (var(--timeline-dot-size, 10px) / 2) + 6px);
+  left: calc(
+    var(--timeline-dot-left, 20px) + (var(--timeline-dot-size, 10px) / 2) + 6px
+  );
   top: calc(-28px + (var(--timeline-dot-size, 10px) / 2) - 6px);
   border: none;
   background: transparent;
