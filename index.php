@@ -3,7 +3,105 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Linea Temporale Locale</title>
+	<title>Timeline SalernoHub | Crea Linee Temporali Personalizzate Online</title>
+	<meta name="description" content="Crea una linea temporale personalizzata online per scuola, religione, lavoro, studio, storia, progetti ed eventi personali. Timeline semplice, veloce e gratuita.">
+	<meta name="keywords" content="linea temporale, timeline online, creare timeline, timeline scuola, timeline religione, timeline lavoro, linea del tempo personalizzata, timeline storia, timeline progetti, timeline eventi">
+	<meta name="author" content="SalernoHub">
+	<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+	<meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+	<meta name="bingbot" content="index, follow">
+	<link rel="canonical" href="https://timeline.salernohub.net/">
+	<meta property="og:type" content="website">
+	<meta property="og:locale" content="it_IT">
+	<meta property="og:site_name" content="Timeline SalernoHub">
+	<meta property="og:title" content="Timeline SalernoHub | Crea Linee Temporali Personalizzate Online">
+	<meta property="og:description" content="Strumento online per creare linee temporali personalizzate per scuola, religione, lavoro, studio, storia e progetti.">
+	<meta property="og:url" content="https://timeline.salernohub.net/">
+	<meta property="og:image" content="https://timeline.salernohub.net/og-image.svg">
+	<meta property="og:image:secure_url" content="https://timeline.salernohub.net/og-image.svg">
+	<meta property="og:image:type" content="image/svg+xml">
+	<meta property="og:image:width" content="1200">
+	<meta property="og:image:height" content="630">
+	<meta property="og:image:alt" content="Timeline SalernoHub - Crea linee temporali personalizzate online">
+	<meta name="twitter:card" content="summary_large_image">
+	<meta name="twitter:title" content="Timeline SalernoHub | Crea Linee Temporali Personalizzate Online">
+	<meta name="twitter:description" content="Crea la tua linea del tempo personalizzata in modo semplice e veloce.">
+	<meta name="twitter:image" content="https://timeline.salernohub.net/og-image.svg">
+	<meta name="application-name" content="Timeline SalernoHub">
+	<meta name="theme-color" content="#2563eb">
+	<meta name="referrer" content="strict-origin-when-cross-origin">
+	<link rel="alternate" href="https://timeline.salernohub.net/" hreflang="it-IT">
+	<script type="application/ld+json">
+	{
+		"@context": "https://schema.org",
+		"@type": "WebSite",
+		"name": "Timeline SalernoHub",
+		"url": "https://timeline.salernohub.net/",
+		"inLanguage": "it-IT",
+		"description": "Applicazione web per creare linee temporali personalizzate per scuola, religione, lavoro, studio, storia e progetti personali.",
+		"potentialAction": {
+			"@type": "SearchAction",
+			"target": "https://timeline.salernohub.net/",
+			"query-input": "required name=timeline"
+		}
+	}
+	</script>
+	<script type="application/ld+json">
+	{
+		"@context": "https://schema.org",
+		"@type": "SoftwareApplication",
+		"name": "Timeline SalernoHub",
+		"applicationCategory": "EducationalApplication",
+		"operatingSystem": "Web",
+		"url": "https://timeline.salernohub.net/",
+		"inLanguage": "it-IT",
+		"offers": {
+			"@type": "Offer",
+			"price": "0",
+			"priceCurrency": "EUR"
+		},
+		"description": "Generatore di linee temporali online per organizzare eventi in ambito scolastico, religioso, lavorativo, universitario, storico, sportivo, medico e personale.",
+		"featureList": [
+			"Creazione di eventi con data, titolo e descrizione",
+			"Aggiunta immagini agli eventi",
+			"Esportazione e importazione JSON",
+			"Modalità schermo intero per presentazioni",
+			"Personalizzazione del titolo timeline"
+		]
+	}
+	</script>
+	<script type="application/ld+json">
+	{
+		"@context": "https://schema.org",
+		"@type": "FAQPage",
+		"mainEntity": [
+			{
+				"@type": "Question",
+				"name": "A cosa serve Timeline SalernoHub?",
+				"acceptedAnswer": {
+					"@type": "Answer",
+					"text": "Timeline SalernoHub permette di creare linee temporali personalizzate online con data, titolo, descrizione e immagini per organizzare eventi in modo chiaro."
+				}
+			},
+			{
+				"@type": "Question",
+				"name": "Per quali ambiti posso usare questa timeline?",
+				"acceptedAnswer": {
+					"@type": "Answer",
+					"text": "Puoi usarla per scuola, religione, lavoro, università, studio della storia, progetti personali, eventi familiari, sport e pianificazione attività."
+				}
+			},
+			{
+				"@type": "Question",
+				"name": "I dati restano privati nel browser?",
+				"acceptedAnswer": {
+					"@type": "Answer",
+					"text": "Gli eventi vengono salvati localmente nel browser e puoi esportarli o importarli con file JSON."
+				}
+			}
+		]
+	}
+	</script>
 	<link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -325,7 +423,7 @@
 				item.dataset.eventId = eventItem.id;
 
 				const imageBlock = eventItem.imageData
-					? `<img class="timeline-image" src="${eventItem.imageData}" alt="${escapeHtml(eventItem.title)}">`
+					? `<img class="timeline-image" src="${eventItem.imageData}" alt="${escapeHtml(eventItem.title)}" loading="lazy" decoding="async">`
 					: '';
 
 				item.innerHTML = `
