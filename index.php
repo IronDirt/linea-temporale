@@ -174,6 +174,30 @@
 
 				<label for="eventDate">Data</label>
 				<input id="eventDate" type="date" required>
+				<div class="date-visibility-options">
+					<label class="checkbox-inline" for="eventShowDay">
+						<input id="eventShowDay" type="checkbox" checked>
+						Mostra giorno
+					</label>
+					<label class="checkbox-inline" for="eventShowMonth">
+						<input id="eventShowMonth" type="checkbox" checked>
+						Mostra mese
+					</label>
+				</div>
+				<div class="date-visibility-options">
+					<label class="checkbox-inline" for="eventUseCustomYear">
+						<input id="eventUseCustomYear" type="checkbox">
+						Usa anno personalizzato
+					</label>
+					<input id="eventCustomYear" class="year-input hidden" type="number" step="1" placeholder="Es. -500">
+				</div>
+
+				<label for="eventEraTag">Targhetta era</label>
+				<select id="eventEraTag">
+					<option value="none">Nessuna</option>
+					<option value="christian">a.C. / d.C.</option>
+					<option value="common-era">a.E.V. / E.V.</option>
+				</select>
 
 				<label for="eventTitle">Titolo</label>
 				<input id="eventTitle" type="text" placeholder="Es. Inizio progetto" required>
@@ -182,7 +206,15 @@
 				<textarea id="eventText" placeholder="Descrizione evento" required></textarea>
 
 				<label for="eventImage">Immagine (opzionale)</label>
-				<input id="eventImage" type="file" accept="image/*">
+				<div class="image-picker-row">
+					<label id="eventImageTrigger" for="eventImage" class="button-like secondary image-picker-btn">Scegli immagine</label>
+					<button type="button" id="removeEventImageBtn" class="muted image-remove-btn hidden">Rimuovi immagine</button>
+					<span id="eventImageName" class="image-picker-name">Nessun file selezionato</span>
+				</div>
+				<input id="eventImage" class="hidden" type="file" accept="image/*">
+				<div id="eventImagePreviewWrap" class="image-preview-wrap hidden">
+					<img id="eventImagePreview" class="image-preview" src="" alt="Anteprima immagine evento">
+				</div>
 
 				<div class="form-actions">
 					<button type="submit" class="primary" id="saveEventBtn">Aggiungi evento</button>
@@ -205,9 +237,19 @@
 		const eventForm = document.getElementById('eventForm');
 		const editIndexInput = document.getElementById('editIndex');
 		const eventDateInput = document.getElementById('eventDate');
+		const eventShowDayInput = document.getElementById('eventShowDay');
+		const eventShowMonthInput = document.getElementById('eventShowMonth');
+		const eventUseCustomYearInput = document.getElementById('eventUseCustomYear');
+		const eventCustomYearInput = document.getElementById('eventCustomYear');
+		const eventEraTagInput = document.getElementById('eventEraTag');
 		const eventTitleInput = document.getElementById('eventTitle');
 		const eventTextInput = document.getElementById('eventText');
 		const eventImageInput = document.getElementById('eventImage');
+		const eventImageTrigger = document.getElementById('eventImageTrigger');
+		const removeEventImageBtn = document.getElementById('removeEventImageBtn');
+		const eventImageName = document.getElementById('eventImageName');
+		const eventImagePreviewWrap = document.getElementById('eventImagePreviewWrap');
+		const eventImagePreview = document.getElementById('eventImagePreview');
 		const clearFormBtn = document.getElementById('clearFormBtn');
 		const saveEventBtn = document.getElementById('saveEventBtn');
 		const fullscreenBtn = document.getElementById('fullscreenBtn');
@@ -235,6 +277,37 @@
 		let timelineData = [];
 		let currentTheme = 'light';
 		let zoomLevel = 0;
+		let imagePreviewObjectUrl = '';
+		let removeImageOnSave = false;
+
+		function hideImagePreview() {
+			if (imagePreviewObjectUrl) {
+				URL.revokeObjectURL(imagePreviewObjectUrl);
+				imagePreviewObjectUrl = '';
+			}
+
+			eventImagePreview.removeAttribute('src');
+			eventImagePreviewWrap.classList.add('hidden');
+		}
+
+		function showImagePreview(src) {
+			eventImagePreview.src = src;
+			eventImagePreviewWrap.classList.remove('hidden');
+		}
+
+		function showImagePreviewFromFile(file) {
+			if (!file) {
+				hideImagePreview();
+				return;
+			}
+
+			if (imagePreviewObjectUrl) {
+				URL.revokeObjectURL(imagePreviewObjectUrl);
+			}
+
+			imagePreviewObjectUrl = URL.createObjectURL(file);
+			showImagePreview(imagePreviewObjectUrl);
+		}
 
 		function getTimelineAnchor() {
 			const items = timelineEl.querySelectorAll('.timeline-item');
@@ -308,9 +381,12 @@
 
 			items.forEach((item, sortedIndex) => {
 				const isEdgeItem = sortedIndex === 0 || sortedIndex === lastIndex;
-				const isCollapsed = zoomLevel > 0 && !isEdgeItem && (sortedIndex % visibilityStep) !== 0;
+				const isPinned = item.dataset.pinned === 'true';
+				const isCollapsed = zoomLevel > 0 && !isEdgeItem && !isPinned && (sortedIndex % visibilityStep) !== 0;
 				item.classList.toggle('timeline-item-collapsed', isCollapsed);
 			});
+
+			updateZoomDensity(items.length);
 
 			updateZoomButtons();
 			updateTimelineLineWidth();
@@ -325,6 +401,27 @@
 			const maxZoomLevel = hasItems ? Math.max(0, timelineData.length - 1) : 0;
 			zoomInBtn.disabled = zoomLevel <= 0;
 			zoomOutBtn.disabled = !hasItems || zoomLevel >= maxZoomLevel;
+		}
+
+		function updateZoomDensity(itemsCount) {
+			if (!itemsCount || zoomLevel <= 0) {
+				timelineEl.style.removeProperty('--timeline-collapsed-item-width');
+				timelineEl.style.removeProperty('--timeline-gap');
+				timelineEl.style.removeProperty('--timeline-dot-size');
+				return;
+			}
+
+			const itemDensity = Math.max(0, itemsCount - 10) / 30;
+			const zoomDensity = zoomLevel / Math.max(1, itemsCount - 1);
+			const compactness = Math.min(1, (itemDensity * 0.75) + (zoomDensity * 2.2));
+
+			const collapsedWidth = Math.round(54 - (compactness * 28));
+			const gap = Math.round(14 - (compactness * 8));
+			const dotSize = Math.round(10 - (compactness * 2));
+
+			timelineEl.style.setProperty('--timeline-collapsed-item-width', `${Math.max(24, collapsedWidth)}px`);
+			timelineEl.style.setProperty('--timeline-gap', `${Math.max(5, gap)}px`);
+			timelineEl.style.setProperty('--timeline-dot-size', `${Math.max(7, dotSize)}px`);
 		}
 
 		function applyTheme(theme) {
@@ -377,17 +474,33 @@
 
 		function updateTimelineLineWidth() {
 			window.requestAnimationFrame(() => {
-				const items = timelineEl.querySelectorAll('.timeline-item');
-				const lastItem = items[items.length - 1];
-				const lastDotX = lastItem
-					? lastItem.offsetLeft + 20 + 5
-					: timelineEl.clientWidth;
-				const lineWidth = Math.max(lastDotX, timelineEl.scrollWidth, timelineEl.clientWidth);
+				const lineWidth = Math.max(timelineEl.scrollWidth, timelineEl.clientWidth);
 				timelineEl.style.setProperty('--timeline-line-width', `${lineWidth}px`);
 			});
 		}
 
-		function formatDate(isoDate) {
+		function updateDateModeUI() {
+			const useCustomYear = eventUseCustomYearInput.checked;
+			eventDateInput.disabled = useCustomYear;
+			eventDateInput.required = !useCustomYear;
+			eventCustomYearInput.classList.toggle('hidden', !useCustomYear);
+			eventCustomYearInput.disabled = !useCustomYear;
+		}
+
+		function formatYearWithEra(year, eraTag) {
+			if (eraTag === 'christian') {
+				return `${Math.abs(year)} ${year < 0 ? 'a.C.' : 'd.C.'}`;
+			}
+
+			if (eraTag === 'common-era') {
+				return `${Math.abs(year)} ${year < 0 ? 'a.E.V.' : 'E.V.'}`;
+			}
+
+			return String(year);
+		}
+
+		function formatDate(isoDate, options = {}) {
+			const { showDay = true, showMonth = true, eraTag = 'none' } = options;
 			if (!isoDate) {
 				return '';
 			}
@@ -395,11 +508,68 @@
 			if (Number.isNaN(date.getTime())) {
 				return isoDate;
 			}
-			return date.toLocaleDateString('it-IT', {
-				year: 'numeric',
-				month: 'long',
-				day: 'numeric'
-			});
+
+			const day = String(date.getDate());
+			const month = date.toLocaleDateString('it-IT', { month: 'long' });
+			const year = formatYearWithEra(date.getFullYear(), eraTag);
+
+			if (showDay && showMonth) {
+				return `${day} ${month} ${year}`;
+			}
+
+			if (showMonth) {
+				return `${month} ${year}`;
+			}
+
+			if (showDay) {
+				return `${day} ${year}`;
+			}
+
+			return year;
+		}
+
+		function getEventSortParts(eventItem) {
+			if (eventItem.useCustomYear && Number.isInteger(eventItem.customYear)) {
+				return {
+					year: eventItem.customYear,
+					month: 0,
+					day: 0
+				};
+			}
+
+			if (typeof eventItem.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(eventItem.date)) {
+				const [year, month, day] = eventItem.date.split('-').map((value) => Number.parseInt(value, 10));
+				return {
+					year,
+					month,
+					day
+				};
+			}
+
+			return {
+				year: Number.MAX_SAFE_INTEGER,
+				month: Number.MAX_SAFE_INTEGER,
+				day: Number.MAX_SAFE_INTEGER
+			};
+		}
+
+		function compareEventsByDate(leftEvent, rightEvent) {
+			const left = getEventSortParts(leftEvent);
+			const right = getEventSortParts(rightEvent);
+
+			if (left.year !== right.year) {
+				return left.year - right.year;
+			}
+
+			if (left.month !== right.month) {
+				return left.month - right.month;
+			}
+
+			if (left.day !== right.day) {
+				return left.day - right.day;
+			}
+
+			return 0;
 		}
 
 		function renderTimeline() {
@@ -410,25 +580,37 @@
 				return;
 			}
 
-			const sorted = [...timelineData].sort((a, b) => a.date.localeCompare(b.date));
+			const sorted = [...timelineData].sort(compareEventsByDate);
 			const maxZoomLevel = Math.max(0, sorted.length - 1);
 			zoomLevel = Math.min(zoomLevel, maxZoomLevel);
 			timelineEl.innerHTML = '';
 
 			sorted.forEach((eventItem) => {
 				const originalIndex = timelineData.findIndex((item) => item.id === eventItem.id);
+				const isPinned = Boolean(eventItem.pinned);
 
 				const item = document.createElement('article');
 				item.className = 'timeline-item';
 				item.dataset.eventId = eventItem.id;
+				item.dataset.pinned = String(isPinned);
 
 				const imageBlock = eventItem.imageData
 					? `<img class="timeline-image" src="${eventItem.imageData}" alt="${escapeHtml(eventItem.title)}" loading="lazy" decoding="async">`
 					: '';
 
+				const hasCustomYear = eventItem.useCustomYear && Number.isInteger(eventItem.customYear);
+				const formattedDate = hasCustomYear
+					? formatYearWithEra(eventItem.customYear, eventItem.eraTag || 'none')
+					: formatDate(eventItem.date, {
+						showDay: eventItem.showDay !== false,
+						showMonth: eventItem.showMonth !== false,
+						eraTag: eventItem.eraTag || 'none'
+					});
+
 				item.innerHTML = `
+					<button type="button" class="timeline-pin-btn${isPinned ? ' is-pinned' : ''}" data-action="pin" data-index="${originalIndex}" aria-label="${isPinned ? 'Rimuovi appuntatura evento' : 'Appunta evento'}" title="${isPinned ? 'Rimuovi appuntatura' : 'Appunta evento'}"><img class="timeline-pin-icon" src="pin-icon.png" alt="" loading="lazy" decoding="async"></button>
 					<div class="timeline-item-content">
-						<div class="timeline-date">${formatDate(eventItem.date)}</div>
+						<div class="timeline-date">${formattedDate}</div>
 						<h3 class="timeline-title">${escapeHtml(eventItem.title)}</h3>
 						${imageBlock}
 						<p class="timeline-text">${escapeHtml(eventItem.text)}</p>
@@ -510,9 +692,19 @@
 		function resetForm() {
 			editIndexInput.value = '-1';
 			eventDateInput.value = '';
+			eventShowDayInput.checked = true;
+			eventShowMonthInput.checked = true;
+			eventUseCustomYearInput.checked = false;
+			eventCustomYearInput.value = '';
+			eventEraTagInput.value = 'none';
+			updateDateModeUI();
 			eventTitleInput.value = '';
 			eventTextInput.value = '';
 			eventImageInput.value = '';
+			eventImageName.textContent = 'Nessun file selezionato';
+			removeImageOnSave = false;
+			removeEventImageBtn.classList.add('hidden');
+			hideImagePreview();
 			saveEventBtn.textContent = 'Aggiungi evento';
 			modalTitle.textContent = 'Nuovo evento';
 		}
@@ -590,10 +782,18 @@
 			event.preventDefault();
 
 			const date = eventDateInput.value;
+			const showDay = eventShowDayInput.checked;
+			const showMonth = eventShowMonthInput.checked;
+			const useCustomYear = eventUseCustomYearInput.checked;
+			const eraTag = eventEraTagInput.value;
 			const title = eventTitleInput.value.trim();
 			const text = eventTextInput.value.trim();
+			const customYear = useCustomYear
+				? Number.parseInt(eventCustomYearInput.value, 10)
+				: null;
 
-			if (!date || !title || !text) {
+			const hasInvalidCustomYear = useCustomYear && !Number.isInteger(customYear);
+			if ((!useCustomYear && !date) || hasInvalidCustomYear || !title || !text) {
 				showStatus('Compila data, titolo e testo.', true);
 				return;
 			}
@@ -612,21 +812,36 @@
 
 			if (editIndex >= 0 && timelineData[editIndex]) {
 				const previous = timelineData[editIndex];
+				const nextImageData = removeImageOnSave
+					? null
+					: (imageData ?? previous.imageData);
 				timelineData[editIndex] = {
 					...previous,
-					date,
+					date: useCustomYear ? '' : date,
+					useCustomYear,
+					customYear,
+					eraTag,
+					showDay,
+					showMonth,
 					title,
 					text,
-					imageData: imageData ?? previous.imageData
+					imageData: nextImageData,
+					pinned: Boolean(previous.pinned)
 				};
 				showStatus('Evento aggiornato con successo.');
 			} else {
 				timelineData.push({
 					id: crypto.randomUUID(),
-					date,
+					date: useCustomYear ? '' : date,
+					useCustomYear,
+					customYear,
+					eraTag,
+					showDay,
+					showMonth,
 					title,
 					text,
-					imageData
+					imageData,
+					pinned: false
 				});
 				showStatus('Evento aggiunto con successo.');
 			}
@@ -734,10 +949,23 @@
 				return;
 			}
 
-			const action = target.dataset.action;
-			const index = Number.parseInt(target.dataset.index || '-1', 10);
+			const actionElement = target.closest('[data-action]');
+			if (!(actionElement instanceof HTMLElement)) {
+				return;
+			}
+
+			const action = actionElement.dataset.action;
+			const index = Number.parseInt(actionElement.dataset.index || '-1', 10);
 
 			if (!action || index < 0 || !timelineData[index]) {
+				return;
+			}
+
+			if (action === 'pin') {
+				event.preventDefault();
+				timelineData[index].pinned = !Boolean(timelineData[index].pinned);
+				saveToLocal();
+				renderTimeline();
 				return;
 			}
 
@@ -745,9 +973,29 @@
 				const eventItem = timelineData[index];
 				editIndexInput.value = String(index);
 				eventDateInput.value = eventItem.date;
+				eventShowDayInput.checked = eventItem.showDay !== false;
+				eventShowMonthInput.checked = eventItem.showMonth !== false;
+				eventUseCustomYearInput.checked = Boolean(eventItem.useCustomYear);
+				eventCustomYearInput.value = Number.isInteger(eventItem.customYear)
+					? String(eventItem.customYear)
+					: '';
+				eventEraTagInput.value = ['none', 'christian', 'common-era'].includes(eventItem.eraTag)
+					? eventItem.eraTag
+					: 'none';
+				updateDateModeUI();
 				eventTitleInput.value = eventItem.title;
 				eventTextInput.value = eventItem.text;
 				eventImageInput.value = '';
+				removeImageOnSave = false;
+				eventImageName.textContent = eventItem.imageData ? 'Immagine già presente' : 'Nessun file selezionato';
+				if (eventItem.imageData) {
+					hideImagePreview();
+					showImagePreview(eventItem.imageData);
+					removeEventImageBtn.classList.remove('hidden');
+				} else {
+					hideImagePreview();
+					removeEventImageBtn.classList.add('hidden');
+				}
 				saveEventBtn.textContent = 'Aggiorna evento';
 				modalTitle.textContent = 'Modifica evento';
 				openModal();
@@ -803,10 +1051,20 @@
 				timelineData = importedEvents.map((item) => ({
 					id: typeof item.id === 'string' ? item.id : crypto.randomUUID(),
 					date: typeof item.date === 'string' ? item.date : '',
+					useCustomYear: Boolean(item.useCustomYear),
+					customYear: Number.isInteger(item.customYear)
+						? item.customYear
+						: (typeof item.customYear === 'number' ? Math.trunc(item.customYear) : null),
+					eraTag: ['none', 'christian', 'common-era'].includes(item.eraTag)
+						? item.eraTag
+						: 'none',
+					showDay: item.showDay !== false,
+					showMonth: item.showMonth !== false,
 					title: typeof item.title === 'string' ? item.title : '',
 					text: typeof item.text === 'string' ? item.text : '',
-					imageData: typeof item.imageData === 'string' ? item.imageData : null
-				})).filter((item) => item.date && item.title && item.text);
+					imageData: typeof item.imageData === 'string' ? item.imageData : null,
+					pinned: Boolean(item.pinned)
+				})).filter((item) => (item.date || (item.useCustomYear && Number.isInteger(item.customYear))) && item.title && item.text);
 
 				await saveToLocal();
 				renderTimeline();
@@ -819,9 +1077,45 @@
 			}
 		});
 
+		eventImageInput.addEventListener('change', () => {
+			const file = eventImageInput.files[0];
+			eventImageName.textContent = file ? `Immagine selezionata: ${file.name}` : 'Nessun file selezionato';
+			removeImageOnSave = false;
+			if (file || Number.parseInt(editIndexInput.value, 10) >= 0) {
+				removeEventImageBtn.classList.remove('hidden');
+			} else {
+				removeEventImageBtn.classList.add('hidden');
+			}
+			showImagePreviewFromFile(file);
+		});
+
+		eventImageTrigger.addEventListener('click', () => {
+			eventImageInput.value = '';
+		});
+
+		eventUseCustomYearInput.addEventListener('change', () => {
+			updateDateModeUI();
+			if (!eventUseCustomYearInput.checked) {
+				eventCustomYearInput.value = '';
+			}
+		});
+
+		removeEventImageBtn.addEventListener('click', () => {
+			eventImageInput.value = '';
+			removeImageOnSave = Number.parseInt(editIndexInput.value, 10) >= 0;
+			eventImageName.textContent = removeImageOnSave
+				? 'Immagine rimossa (salva per confermare)'
+				: 'Nessun file selezionato';
+			hideImagePreview();
+			if (!removeImageOnSave) {
+				removeEventImageBtn.classList.add('hidden');
+			}
+		});
+
 		(async function init() {
 			applyTheme(loadTheme());
 			updateFullscreenState();
+			updateDateModeUI();
 			setTimelineTitle(loadTimelineTitle());
 			await loadFromLocal();
 			renderTimeline();
