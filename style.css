@@ -962,7 +962,9 @@ button:focus:not(:focus-visible),
 }
 
 .local-reset-actions button {
-  transition: background-color 180ms ease, color 180ms ease;
+  transition:
+    background-color 180ms ease,
+    color 180ms ease;
 }
 
 .local-reset-actions button.is-success {
