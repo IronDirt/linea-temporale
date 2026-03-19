@@ -224,6 +224,16 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 	<meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
 	<meta name="bingbot" content="index, follow">
 	<link rel="canonical" href="https://timeline.salernohub.net/">
+	<link rel="alternate" href="https://timeline.salernohub.net/" hreflang="it-IT">
+	<link rel="alternate" href="https://timeline.salernohub.net/?lang=en" hreflang="en">
+	<link rel="alternate" href="https://timeline.salernohub.net/?lang=es" hreflang="es">
+	<link rel="alternate" href="https://timeline.salernohub.net/?lang=de" hreflang="de">
+	<link rel="alternate" href="https://timeline.salernohub.net/?lang=fr" hreflang="fr">
+	<link rel="alternate" href="https://timeline.salernohub.net/?lang=pt" hreflang="pt">
+	<link rel="alternate" href="https://timeline.salernohub.net/?lang=ru" hreflang="ru">
+	<link rel="alternate" href="https://timeline.salernohub.net/?lang=tr" hreflang="tr">
+	<link rel="alternate" href="https://timeline.salernohub.net/?lang=ja" hreflang="ja">
+	<link rel="alternate" href="https://timeline.salernohub.net/?lang=zh" hreflang="zh">
 	<meta property="og:type" content="website">
 	<meta property="og:locale" content="it_IT">
 	<meta property="og:site_name" content="Timeline SalernoHub">
