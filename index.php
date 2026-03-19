@@ -42,6 +42,54 @@ if (!is_dir($storageDir)) {
 	mkdir($storageDir, 0775, true);
 }
 
+if (($_GET['api'] ?? '') === 'delete' && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
+	header('Content-Type: application/json; charset=utf-8');
+
+	try {
+		$rawBody = file_get_contents('php://input');
+		$payload = json_decode($rawBody ?: '{}', true, 512, JSON_THROW_ON_ERROR);
+
+		$timelineId = isset($payload['timelineId']) && is_string($payload['timelineId'])
+			? trim($payload['timelineId'])
+			: '';
+		$adminToken = isset($payload['adminToken']) && is_string($payload['adminToken'])
+			? trim($payload['adminToken'])
+			: '';
+
+		if ($timelineId === '' || preg_match('/^[a-f0-9]{12}$/', $timelineId) !== 1) {
+			http_response_code(400);
+			echo json_encode(['ok' => false, 'message' => 'ID timeline non valido.'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+			exit;
+		}
+
+		$filePath = $storageDir . '/' . $timelineId . '.json';
+
+		if (!is_file($filePath)) {
+			http_response_code(404);
+			echo json_encode(['ok' => false, 'message' => 'Timeline non trovata.'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+			exit;
+		}
+
+		$content = file_get_contents($filePath);
+		$decoded = json_decode($content ?: '{}', true);
+
+		if (!is_array($decoded) || !isset($decoded['adminToken']) || !hash_equals((string) $decoded['adminToken'], $adminToken)) {
+			http_response_code(403);
+			echo json_encode(['ok' => false, 'message' => 'Token admin non valido.'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+			exit;
+		}
+
+		unlink($filePath);
+
+		echo json_encode(['ok' => true], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+		exit;
+	} catch (Throwable $error) {
+		http_response_code(500);
+		echo json_encode(['ok' => false, 'message' => 'Errore durante la cancellazione online.'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+		exit;
+	}
+}
+
 if (($_GET['api'] ?? '') === 'save' && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
 	header('Content-Type: application/json; charset=utf-8');
 
@@ -334,19 +382,19 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 						<path d="M12 2v2.5M12 19.5V22M4.93 4.93l1.77 1.77M17.3 17.3l1.77 1.77M2 12h2.5M19.5 12H22M4.93 19.07l1.77-1.77M17.3 6.7l1.77-1.77"></path>
 					</svg>
 				</button>
+				<button type="button" class="muted timeline-reset-btn fab-reset hidden" id="resetTimelineBtn" aria-label="Crea nuova linea temporale locale" title="Nuova linea temporale (solo locale)">
+					<svg class="timeline-reset-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+						<path d="M3 6h18"></path>
+						<path d="M8 6V4h8v2"></path>
+						<path d="M6 6l1 14h10l1-14"></path>
+						<path d="M10 10v7M14 10v7"></path>
+					</svg>
+				</button>
 				<input id="uploadInput" class="hidden" type="file" accept="application/json">
 			</div>
 		</div>
 
 		<section class="card timeline-section">
-			<button type="button" class="muted timeline-reset-btn hidden" id="resetTimelineBtn" aria-label="Crea nuova linea temporale locale" title="Nuova linea temporale (solo locale)">
-				<svg class="timeline-reset-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-					<path d="M3 6h18"></path>
-					<path d="M8 6V4h8v2"></path>
-					<path d="M6 6l1 14h10l1-14"></path>
-					<path d="M10 10v7M14 10v7"></path>
-				</svg>
-			</button>
 			<div class="timeline-topbar">
 				<div class="timeline-header">
 					<button type="button" class="muted timeline-title-edit" id="editTimelineTitleBtn" aria-label="Modifica titolo timeline" title="Modifica titolo">✎</button>
@@ -395,7 +443,19 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 				<button type="button" class="secondary" id="localResetDownloadBtn">Scarica</button>
 				<button type="button" class="secondary" id="localResetSaveOnlineBtn">Salva online</button>
 				<button type="button" class="danger" id="localResetConfirmBtn">Cancella solo locale</button>
-				<button type="button" class="muted" id="localResetCancelBtn">Annulla</button>
+				<button type="button" class="danger" id="localResetDeleteOnlineBtn">Cancella online</button>
+			</div>
+			<div class="local-reset-online-panel online-save-field hidden" id="localResetAdminLinkWrap">
+				<label for="localResetAdminLinkInput">Link admin</label>
+				<div class="online-save-input-row">
+					<input type="text" id="localResetAdminLinkInput" readonly placeholder="Salva online per ottenere il link admin">
+					<button type="button" class="muted copy-link-btn" id="localResetCopyAdminLinkBtn" aria-label="Copia link admin" title="Copia link admin">
+						<svg class="copy-link-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+							<rect x="9" y="9" width="13" height="13" rx="2"></rect>
+							<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+						</svg>
+					</button>
+				</div>
 			</div>
 		</section>
 	</div>
@@ -438,24 +498,6 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 				<path d="M6 6l12 12M18 6L6 18"></path>
 			</svg>
 		</button>
-	</div>
-
-	<div class="modal hidden" id="localResetModal" role="dialog" aria-modal="true" aria-labelledby="localResetTitle">
-		<div class="modal-backdrop" id="localResetBackdrop"></div>
-		<section class="modal-card local-reset-card">
-			<div class="modal-header">
-				<h2 id="localResetTitle">Nuova linea temporale</h2>
-				<button type="button" class="muted close-btn" id="closeLocalResetBtn" aria-label="Chiudi">✕</button>
-			</div>
-			<p class="local-reset-text">Questa azione cancellerà la timeline solo in locale (dispositivo/browser attuale). La versione online non verrà eliminata.</p>
-			<p class="local-reset-text">Prima di procedere, si consiglia di scaricare la linea temporale o salvarla online.</p>
-			<div class="local-reset-actions">
-				<button type="button" class="secondary" id="localResetDownloadBtn">Scarica</button>
-				<button type="button" class="secondary" id="localResetSaveOnlineBtn">Salva online</button>
-				<button type="button" class="danger" id="localResetConfirmBtn">Cancella solo locale</button>
-				<button type="button" class="muted" id="localResetCancelBtn">Annulla</button>
-			</div>
-		</section>
 	</div>
 
 	<div class="modal hidden" id="eventModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
@@ -530,6 +572,7 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 		const IMAGE_MAX_WIDTH = 1600;
 		const IMAGE_MAX_HEIGHT = 1600;
 		const IMAGE_QUALITY = 0.8;
+		const LOCAL_RESET_MODAL_ANIMATION_MS = 220;
 
 		const eventForm = document.getElementById('eventForm');
 		const editIndexInput = document.getElementById('editIndex');
@@ -602,7 +645,10 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 		const localResetDownloadBtn = document.getElementById('localResetDownloadBtn');
 		const localResetSaveOnlineBtn = document.getElementById('localResetSaveOnlineBtn');
 		const localResetConfirmBtn = document.getElementById('localResetConfirmBtn');
-		const localResetCancelBtn = document.getElementById('localResetCancelBtn');
+		const localResetAdminLinkWrap = document.getElementById('localResetAdminLinkWrap');
+		const localResetAdminLinkInput = document.getElementById('localResetAdminLinkInput');
+		const localResetCopyAdminLinkBtn = document.getElementById('localResetCopyAdminLinkBtn');
+		const localResetDeleteOnlineBtn = document.getElementById('localResetDeleteOnlineBtn');
 		const APP_MODE = <?php echo json_encode($appMode, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>;
 		const SHARED_TIMELINE_PAYLOAD = <?php echo json_encode($sharedPayload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>;
 		const START_WITH_EMPTY_TIMELINE = new URLSearchParams(window.location.search).get('new') === '1';
@@ -614,6 +660,7 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 		let removeImageOnSave = false;
 		let sharedTimelineId = null;
 		let sharedAdminToken = null;
+		let localResetModalCloseTimerId = 0;
 
 		function hideImagePreview() {
 			if (imagePreviewObjectUrl) {
@@ -1230,10 +1277,53 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 			}
 		}
 
-		async function saveOnlineTimeline() {
-			saveOnlineBtn.disabled = true;
-			const originalLabel = saveOnlineBtn.textContent;
-			saveOnlineBtn.textContent = 'Salvataggio...';
+		function flashActionSuccess(buttonElement) {
+			if (!buttonElement) {
+				return;
+			}
+
+			buttonElement.classList.remove('is-success');
+			void buttonElement.offsetWidth;
+			buttonElement.classList.add('is-success');
+			window.setTimeout(() => {
+				buttonElement.classList.remove('is-success');
+			}, 1100);
+		}
+
+		function setPersistentActionSuccess(buttonElement, successLabel) {
+			if (!buttonElement) {
+				return;
+			}
+
+			buttonElement.classList.add('is-success');
+			if (typeof successLabel === 'string' && successLabel.trim()) {
+				buttonElement.textContent = successLabel;
+			}
+		}
+
+		function updateLocalResetAdminLinkPanel() {
+			const adminUrl = adminLinkInput.value.trim();
+			localResetAdminLinkInput.value = adminUrl;
+			localResetAdminLinkWrap.classList.toggle('hidden', !adminUrl);
+		}
+
+		async function saveOnlineTimeline(triggerButton = saveOnlineBtn, options = {}) {
+			const {
+				restoreLabelOnSuccess = true,
+				successLabel = '',
+				onSuccess = null
+			} = options;
+
+			const buttonsToDisable = [saveOnlineBtn, triggerButton].filter(Boolean);
+			buttonsToDisable.forEach((button) => {
+				button.disabled = true;
+			});
+
+			const originalLabel = triggerButton ? triggerButton.textContent : '';
+			let saveSucceeded = false;
+			if (triggerButton) {
+				triggerButton.textContent = 'Salvataggio...';
+			}
 
 			try {
 				const response = await fetch('?api=save', {
@@ -1260,33 +1350,79 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 				adminLinkInput.value = typeof result.adminUrl === 'string' ? result.adminUrl : '';
 				viewerLinkInput.value = typeof result.viewerUrl === 'string' ? result.viewerUrl : '';
 				persistOnlineShareState();
+				saveSucceeded = true;
 				showStatus('Timeline salvata online.');
+				if (typeof onSuccess === 'function') {
+					onSuccess(result);
+				}
+
+				if (restoreLabelOnSuccess) {
+					flashActionSuccess(triggerButton);
+				} else {
+					setPersistentActionSuccess(triggerButton, successLabel);
+				}
 			} catch (error) {
 				window.alert(error instanceof Error ? error.message : 'Errore durante il salvataggio online.');
 			} finally {
-				saveOnlineBtn.disabled = false;
-				saveOnlineBtn.textContent = originalLabel;
+				buttonsToDisable.forEach((button) => {
+					button.disabled = false;
+				});
+				if (triggerButton && (!saveSucceeded || restoreLabelOnSuccess)) {
+					triggerButton.textContent = originalLabel;
+				}
+			}
+		}
+
+		async function deleteOnlineTimeline() {
+			if (!sharedTimelineId || !sharedAdminToken) {
+				window.alert('Nessuna timeline online trovata. Salva prima la timeline online per poterla cancellare.');
+				return;
+			}
+
+			localResetDeleteOnlineBtn.disabled = true;
+			const originalLabel = localResetDeleteOnlineBtn.textContent;
+			localResetDeleteOnlineBtn.textContent = 'Cancellazione...';
+
+			try {
+				const response = await fetch('?api=delete', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						timelineId: sharedTimelineId,
+						adminToken: sharedAdminToken
+					})
+				});
+
+				const result = await response.json();
+
+				if (!response.ok || !result.ok) {
+					throw new Error(result && result.message ? result.message : 'Cancellazione online non riuscita.');
+				}
+
+				sharedTimelineId = null;
+				sharedAdminToken = null;
+				adminLinkInput.value = '';
+				viewerLinkInput.value = '';
+				persistOnlineShareState();
+				updateLocalResetAdminLinkPanel();
+				showStatus('Timeline cancellata online.');
+				setPersistentActionSuccess(localResetDeleteOnlineBtn, 'Cancellato online');
+			} catch (error) {
+				window.alert(error instanceof Error ? error.message : 'Errore durante la cancellazione online.');
+				localResetDeleteOnlineBtn.textContent = originalLabel;
+			} finally {
+				localResetDeleteOnlineBtn.disabled = false;
 			}
 		}
 
 		async function clearLocalTimelineData() {
-			const confirmed = window.confirm(
-				'Attenzione: questa azione cancellerà la linea temporale solo in locale (su questo dispositivo/browser).\n\n'
-				+ 'La versione online non verrà eliminata.\n'
-				+ 'Si consiglia di scaricare la linea o salvarla online prima di continuare.\n\n'
-				+ 'Vuoi continuare?'
-			);
-
-			if (!confirmed) {
-				return;
-			}
-
 			timelineData = [];
 			zoomLevel = 0;
 			sharedTimelineId = null;
 			sharedAdminToken = null;
 			adminLinkInput.value = '';
 			viewerLinkInput.value = '';
+			updateLocalResetAdminLinkPanel();
 
 			localStorage.removeItem(STORAGE_KEY);
 			localStorage.removeItem(SHARE_LINKS_KEY);
@@ -1389,12 +1525,38 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 		}
 
 		function openLocalResetModal() {
+			if (localResetModalCloseTimerId) {
+				window.clearTimeout(localResetModalCloseTimerId);
+				localResetModalCloseTimerId = 0;
+			}
+
+			updateLocalResetAdminLinkPanel();
 			localResetModal.classList.remove('hidden');
+			localResetModal.classList.remove('is-closing');
+			window.requestAnimationFrame(() => {
+				localResetModal.classList.add('is-visible');
+			});
 			document.body.classList.add('modal-open');
 		}
 
 		function closeLocalResetModal() {
-			localResetModal.classList.add('hidden');
+			if (localResetModal.classList.contains('hidden')) {
+				return;
+			}
+
+			localResetModal.classList.remove('is-visible');
+			localResetModal.classList.add('is-closing');
+
+			if (localResetModalCloseTimerId) {
+				window.clearTimeout(localResetModalCloseTimerId);
+			}
+
+			localResetModalCloseTimerId = window.setTimeout(() => {
+				localResetModal.classList.add('hidden');
+				localResetModal.classList.remove('is-closing');
+				localResetModalCloseTimerId = 0;
+			}, LOCAL_RESET_MODAL_ANIMATION_MS);
+
 			document.body.classList.remove('modal-open');
 		}
 
@@ -1595,19 +1757,33 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 		});
 
 		closeLocalResetBtn.addEventListener('click', closeLocalResetModal);
-		localResetCancelBtn.addEventListener('click', closeLocalResetModal);
 		localResetBackdrop.addEventListener('click', closeLocalResetModal);
 
 		localResetDownloadBtn.addEventListener('click', () => {
 			downloadTimelineData();
+			setPersistentActionSuccess(localResetDownloadBtn, 'Scaricato');
 		});
 
-		localResetSaveOnlineBtn.addEventListener('click', () => {
-			saveOnlineTimeline();
+		localResetSaveOnlineBtn.addEventListener('click', async () => {
+			await saveOnlineTimeline(localResetSaveOnlineBtn, {
+				restoreLabelOnSuccess: false,
+				successLabel: 'Salvato online',
+				onSuccess: () => {
+					updateLocalResetAdminLinkPanel();
+				}
+			});
+		});
+
+		localResetCopyAdminLinkBtn.addEventListener('click', () => {
+			handleCopyLink(localResetAdminLinkInput, localResetCopyAdminLinkBtn);
 		});
 
 		localResetConfirmBtn.addEventListener('click', () => {
 			clearLocalTimelineData();
+		});
+
+		localResetDeleteOnlineBtn.addEventListener('click', () => {
+			deleteOnlineTimeline();
 		});
 
 		editTimelineTitleBtn.addEventListener('click', () => {

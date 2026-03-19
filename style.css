@@ -243,7 +243,6 @@ button:focus:not(:focus-visible),
 }
 
 .timeline-section {
-  position: relative;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -264,18 +263,20 @@ button:focus:not(:focus-visible),
 }
 
 .timeline-reset-btn {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  z-index: 6;
-  width: 48px;
-  height: 48px;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
   padding: 0;
 }
 
+.fab-reset {
+  background: #cec6ba;
+  color: #2f2c26;
+}
+
 .timeline-reset-icon {
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   fill: none;
   stroke: currentColor;
   stroke-width: 2;
@@ -956,6 +957,64 @@ button:focus:not(:focus-visible),
   gap: 8px;
 }
 
+.local-reset-online-panel {
+  margin-top: 10px;
+}
+
+.local-reset-actions button {
+  transition: background-color 180ms ease, color 180ms ease;
+}
+
+.local-reset-actions button.is-success {
+  background: #2f8f5b;
+  color: #eefaf3;
+}
+
+#localResetModal {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 220ms ease,
+    visibility 0ms linear 220ms;
+}
+
+#localResetModal .modal-backdrop {
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+
+#localResetModal .local-reset-card {
+  opacity: 0;
+  transform: translateY(12px) scale(0.985);
+  transition:
+    opacity 220ms ease,
+    transform 240ms ease;
+}
+
+#localResetModal.is-visible,
+#localResetModal.is-closing {
+  display: grid;
+}
+
+#localResetModal.is-visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition:
+    opacity 220ms ease,
+    visibility 0ms linear;
+}
+
+#localResetModal.is-visible .modal-backdrop {
+  opacity: 1;
+}
+
+#localResetModal.is-visible .local-reset-card {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
 .modal-header {
   display: flex;
   justify-content: space-between;
@@ -1118,6 +1177,11 @@ body.theme-dark .fab-fullscreen {
   color: #e2e8f0;
 }
 
+body.theme-dark .fab-reset {
+  background: #1f2937;
+  color: #e5e7eb;
+}
+
 body.theme-dark .backup-menu {
   background: #0f172a;
   border: 1px solid #334155;
@@ -1179,6 +1243,11 @@ body.theme-dark .modal-header h2 {
 
 body.theme-dark .local-reset-text {
   color: #cbd5e1;
+}
+
+body.theme-dark .local-reset-actions button.is-success {
+  background: #1f8a55;
+  color: #e8fff1;
 }
 
 body.presentation-mode .fab-stack,
@@ -1276,13 +1345,6 @@ body.presentation-mode .timeline-text {
     padding: 18px 10px 0;
   }
 
-  .timeline-reset-btn {
-    top: 10px;
-    right: 10px;
-    width: 44px;
-    height: 44px;
-  }
-
   .timeline-topbar {
     padding-right: 10px;
   }
@@ -1328,7 +1390,9 @@ body.presentation-mode .timeline-text {
     height: 20px;
   }
 
-  body.presentation-mode:not(.viewer-mode) .timeline-right-controls .timeline-zoom-controls {
+  body.presentation-mode:not(.viewer-mode)
+    .timeline-right-controls
+    .timeline-zoom-controls {
     position: fixed;
     right: 10px;
     bottom: 10px;
