@@ -31,15 +31,18 @@ window.__i18n_es = {
   zoomControlsLabel: "Controles de zoom de la línea temporal",
   localResetTitleText: "Nueva línea temporal",
   closeLabel: "Cerrar",
-  localResetText1: "Esta acción eliminará la línea temporal solo localmente (dispositivo/navegador actual).",
+  localResetText1:
+    "Esta acción eliminará la línea temporal solo localmente (dispositivo/navegador actual).",
   localResetText2: "La versión en línea no se eliminará.",
-  localResetText3: "Antes de continuar, se recomienda descargar la línea temporal o guardarla en línea.",
+  localResetText3:
+    "Antes de continuar, se recomienda descargar la línea temporal o guardarla en línea.",
   localResetDownloadText: "Descargar",
   localResetSaveOnlineText: "Guardar en línea",
   localResetConfirmText: "Eliminar solo local",
   localResetDeleteOnlineText: "Eliminar en línea",
   localResetAdminLinkLabel: "Enlace de administrador",
-  localResetAdminLinkPlaceholder: "Guarda en línea para obtener el enlace de administrador",
+  localResetAdminLinkPlaceholder:
+    "Guarda en línea para obtener el enlace de administrador",
   mobileViewerActionsLabel: "Acciones del visualizador móvil",
   mobileViewerMenuOpenLabel: "Abrir acciones del visualizador",
   mobileViewerMenuCloseLabel: "Cerrar acciones del visualizador",
@@ -91,7 +94,8 @@ window.__i18n_es = {
   imageRemovedPending: "Imagen eliminada (guarda para confirmar)",
   saveOnlineError: "Error al guardar en línea.",
   cannotCopyLink: "No se pudo copiar el enlace automáticamente.",
-  noOnlineTimeline: "No se encontró ninguna línea temporal en línea. Guarda la línea temporal en línea antes de eliminarla.",
+  noOnlineTimeline:
+    "No se encontró ninguna línea temporal en línea. Guarda la línea temporal en línea antes de eliminarla.",
   invalidTimelineFile: "El archivo no contiene una línea temporal válida.",
   insertEventData: "Por favor, introduce los datos del nuevo evento.",
   eraBC: "a.C.",

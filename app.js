@@ -11,7 +11,7 @@ function detectLang() {
     pt: "pt",
     ru: "ru",
     tr: "tr",
-    zh: "zh"
+    zh: "zh",
   };
   if (APP_MODE === "viewer") {
     const navLang = (navigator.language || "").toLowerCase();
@@ -44,7 +44,7 @@ function t(key) {
     pt: window.__i18n_pt,
     ru: window.__i18n_ru,
     tr: window.__i18n_tr,
-    zh: window.__i18n_zh
+    zh: window.__i18n_zh,
   };
   const dict = dicts[currentLang] || dicts.en;
   return dict && key in dict ? dict[key] : key;
@@ -200,7 +200,10 @@ function initLangToggle() {
   // Chiudi menu se clic fuori
   document.addEventListener("click", (event) => {
     if (!langMenu.classList.contains("hidden")) {
-      if (!(event.target instanceof HTMLElement) || (!langMenu.contains(event.target) && event.target !== langBtn)) {
+      if (
+        !(event.target instanceof HTMLElement) ||
+        (!langMenu.contains(event.target) && event.target !== langBtn)
+      ) {
         langMenu.classList.add("hidden");
       }
     }

@@ -31,15 +31,18 @@ window.__i18n_tr = {
   zoomControlsLabel: "Zaman çizelgesi zoom kontrolleri",
   localResetTitleText: "Yeni zaman çizelgesi",
   closeLabel: "Kapat",
-  localResetText1: "Bu işlem zaman çizelgesini yalnızca yerel olarak (mevcut cihaz/tarayıcı) silecektir.",
+  localResetText1:
+    "Bu işlem zaman çizelgesini yalnızca yerel olarak (mevcut cihaz/tarayıcı) silecektir.",
   localResetText2: "Çevrimiçi sürüm silinmeyecek.",
-  localResetText3: "Devam etmeden önce zaman çizelgesini indirmeniz veya çevrimiçi olarak kaydetmeniz önerilir.",
+  localResetText3:
+    "Devam etmeden önce zaman çizelgesini indirmeniz veya çevrimiçi olarak kaydetmeniz önerilir.",
   localResetDownloadText: "İndir",
   localResetSaveOnlineText: "Çevrimiçi kaydet",
   localResetConfirmText: "Sadece yerel sil",
   localResetDeleteOnlineText: "Çevrimiçi sil",
   localResetAdminLinkLabel: "Yönetici bağlantısı",
-  localResetAdminLinkPlaceholder: "Yönetici bağlantısı almak için çevrimiçi kaydedin",
+  localResetAdminLinkPlaceholder:
+    "Yönetici bağlantısı almak için çevrimiçi kaydedin",
   mobileViewerActionsLabel: "Mobil görüntüleyici işlemleri",
   mobileViewerMenuOpenLabel: "Görüntüleyici işlemlerini aç",
   mobileViewerMenuCloseLabel: "Görüntüleyici işlemlerini kapat",
@@ -91,7 +94,8 @@ window.__i18n_tr = {
   imageRemovedPending: "Resim kaldırıldı (onaylamak için kaydedin)",
   saveOnlineError: "Çevrimiçi kaydetme başarısız.",
   cannotCopyLink: "Bağlantı otomatik olarak kopyalanamadı.",
-  noOnlineTimeline: "Çevrimiçi zaman çizelgesi bulunamadı. Silmeden önce zaman çizelgesini çevrimiçi kaydedin.",
+  noOnlineTimeline:
+    "Çevrimiçi zaman çizelgesi bulunamadı. Silmeden önce zaman çizelgesini çevrimiçi kaydedin.",
   invalidTimelineFile: "Dosya geçerli bir zaman çizelgesi içermiyor.",
   insertEventData: "Lütfen yeni etkinlik verilerini girin.",
   eraBC: "M.Ö.",

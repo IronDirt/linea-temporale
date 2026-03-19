@@ -31,15 +31,18 @@ window.__i18n_ru = {
   zoomControlsLabel: "Контроль масштабирования хронологии",
   localResetTitleText: "Новая хронология",
   closeLabel: "Закрыть",
-  localResetText1: "Это действие удалит хронологию только локально (текущее устройство/браузер).",
+  localResetText1:
+    "Это действие удалит хронологию только локально (текущее устройство/браузер).",
   localResetText2: "Онлайн-версия не будет удалена.",
-  localResetText3: "Перед продолжением рекомендуется скачать хронологию или сохранить её онлайн.",
+  localResetText3:
+    "Перед продолжением рекомендуется скачать хронологию или сохранить её онлайн.",
   localResetDownloadText: "Скачать",
   localResetSaveOnlineText: "Сохранить онлайн",
   localResetConfirmText: "Удалить только локально",
   localResetDeleteOnlineText: "Удалить онлайн",
   localResetAdminLinkLabel: "Админ-ссылка",
-  localResetAdminLinkPlaceholder: "Сохраните онлайн, чтобы получить админ-ссылку",
+  localResetAdminLinkPlaceholder:
+    "Сохраните онлайн, чтобы получить админ-ссылку",
   mobileViewerActionsLabel: "Действия мобильного просмотра",
   mobileViewerMenuOpenLabel: "Открыть действия просмотра",
   mobileViewerMenuCloseLabel: "Закрыть действия просмотра",
@@ -91,7 +94,8 @@ window.__i18n_ru = {
   imageRemovedPending: "Изображение удалено (сохраните для подтверждения)",
   saveOnlineError: "Ошибка сохранения онлайн.",
   cannotCopyLink: "Не удалось автоматически скопировать ссылку.",
-  noOnlineTimeline: "Онлайн-хронология не найдена. Сначала сохраните хронологию онлайн, прежде чем удалять её.",
+  noOnlineTimeline:
+    "Онлайн-хронология не найдена. Сначала сохраните хронологию онлайн, прежде чем удалять её.",
   invalidTimelineFile: "Файл не содержит действительную хронологию.",
   insertEventData: "Пожалуйста, введите данные нового события.",
   eraBC: "до н.э.",

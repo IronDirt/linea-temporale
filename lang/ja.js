@@ -31,15 +31,18 @@ window.__i18n_ja = {
   zoomControlsLabel: "タイムラインズームコントロール",
   localResetTitleText: "新しいタイムライン",
   closeLabel: "閉じる",
-  localResetText1: "この操作はタイムラインをローカル（現在のデバイス/ブラウザ）だけで削除します。",
+  localResetText1:
+    "この操作はタイムラインをローカル（現在のデバイス/ブラウザ）だけで削除します。",
   localResetText2: "オンライン版は削除されません。",
-  localResetText3: "続行する前にタイムラインをダウンロードするかオンラインで保存することをおすすめします。",
+  localResetText3:
+    "続行する前にタイムラインをダウンロードするかオンラインで保存することをおすすめします。",
   localResetDownloadText: "ダウンロード",
   localResetSaveOnlineText: "オンライン保存",
   localResetConfirmText: "ローカルのみ削除",
   localResetDeleteOnlineText: "オンライン削除",
   localResetAdminLinkLabel: "管理者リンク",
-  localResetAdminLinkPlaceholder: "管理者リンクを取得するにはオンライン保存してください",
+  localResetAdminLinkPlaceholder:
+    "管理者リンクを取得するにはオンライン保存してください",
   mobileViewerActionsLabel: "モバイル閲覧者の操作",
   mobileViewerMenuOpenLabel: "閲覧者の操作を開く",
   mobileViewerMenuCloseLabel: "閲覧者の操作を閉じる",
@@ -91,7 +94,8 @@ window.__i18n_ja = {
   imageRemovedPending: "画像が削除されました（保存して確定）",
   saveOnlineError: "オンライン保存に失敗しました。",
   cannotCopyLink: "リンクを自動でコピーできませんでした。",
-  noOnlineTimeline: "オンラインタイムラインが見つかりません。削除する前にタイムラインをオンラインで保存してください。",
+  noOnlineTimeline:
+    "オンラインタイムラインが見つかりません。削除する前にタイムラインをオンラインで保存してください。",
   invalidTimelineFile: "ファイルに有効なタイムラインが含まれていません。",
   insertEventData: "新しいイベントのデータを入力してください。",
   eraBC: "紀元前",

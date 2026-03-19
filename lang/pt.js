@@ -31,15 +31,18 @@ window.__i18n_pt = {
   zoomControlsLabel: "Controles de zoom da linha do tempo",
   localResetTitleText: "Nova linha do tempo",
   closeLabel: "Fechar",
-  localResetText1: "Esta ação excluirá a linha do tempo apenas localmente (dispositivo/navegador atual).",
+  localResetText1:
+    "Esta ação excluirá a linha do tempo apenas localmente (dispositivo/navegador atual).",
   localResetText2: "A versão online não será excluída.",
-  localResetText3: "Antes de continuar, recomenda-se baixar a linha do tempo ou salvá-la online.",
+  localResetText3:
+    "Antes de continuar, recomenda-se baixar a linha do tempo ou salvá-la online.",
   localResetDownloadText: "Baixar",
   localResetSaveOnlineText: "Salvar online",
   localResetConfirmText: "Excluir apenas local",
   localResetDeleteOnlineText: "Excluir online",
   localResetAdminLinkLabel: "Link de administrador",
-  localResetAdminLinkPlaceholder: "Salve online para obter o link de administrador",
+  localResetAdminLinkPlaceholder:
+    "Salve online para obter o link de administrador",
   mobileViewerActionsLabel: "Ações do visualizador móvel",
   mobileViewerMenuOpenLabel: "Abrir ações do visualizador",
   mobileViewerMenuCloseLabel: "Fechar ações do visualizador",
@@ -91,7 +94,8 @@ window.__i18n_pt = {
   imageRemovedPending: "Imagem removida (salve para confirmar)",
   saveOnlineError: "Falha ao salvar online.",
   cannotCopyLink: "Não foi possível copiar o link automaticamente.",
-  noOnlineTimeline: "Nenhuma linha do tempo online encontrada. Salve a linha do tempo online antes de excluí-la.",
+  noOnlineTimeline:
+    "Nenhuma linha do tempo online encontrada. Salve a linha do tempo online antes de excluí-la.",
   invalidTimelineFile: "O arquivo não contém uma linha do tempo válida.",
   insertEventData: "Por favor, insira os dados do novo evento.",
   eraBC: "a.C.",

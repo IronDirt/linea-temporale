@@ -31,15 +31,18 @@ window.__i18n_de = {
   zoomControlsLabel: "Zoom-Steuerung der Zeitachse",
   localResetTitleText: "Neue Zeitachse",
   closeLabel: "Schließen",
-  localResetText1: "Diese Aktion löscht die Zeitachse nur lokal (aktuelles Gerät/Browser).",
+  localResetText1:
+    "Diese Aktion löscht die Zeitachse nur lokal (aktuelles Gerät/Browser).",
   localResetText2: "Die Online-Version wird nicht gelöscht.",
-  localResetText3: "Vor dem Fortfahren wird empfohlen, die Zeitachse herunterzuladen oder online zu speichern.",
+  localResetText3:
+    "Vor dem Fortfahren wird empfohlen, die Zeitachse herunterzuladen oder online zu speichern.",
   localResetDownloadText: "Herunterladen",
   localResetSaveOnlineText: "Online speichern",
   localResetConfirmText: "Nur lokal löschen",
   localResetDeleteOnlineText: "Online löschen",
   localResetAdminLinkLabel: "Admin-Link",
-  localResetAdminLinkPlaceholder: "Online speichern, um den Admin-Link zu erhalten",
+  localResetAdminLinkPlaceholder:
+    "Online speichern, um den Admin-Link zu erhalten",
   mobileViewerActionsLabel: "Mobile Viewer-Aktionen",
   mobileViewerMenuOpenLabel: "Viewer-Aktionen öffnen",
   mobileViewerMenuCloseLabel: "Viewer-Aktionen schließen",
@@ -91,7 +94,8 @@ window.__i18n_de = {
   imageRemovedPending: "Bild entfernt (zum Bestätigen speichern)",
   saveOnlineError: "Online-Speicherung fehlgeschlagen.",
   cannotCopyLink: "Link konnte nicht automatisch kopiert werden.",
-  noOnlineTimeline: "Keine Online-Zeitachse gefunden. Speichern Sie die Zeitachse zuerst online, bevor Sie sie löschen.",
+  noOnlineTimeline:
+    "Keine Online-Zeitachse gefunden. Speichern Sie die Zeitachse zuerst online, bevor Sie sie löschen.",
   invalidTimelineFile: "Die Datei enthält keine gültige Zeitachse.",
   insertEventData: "Bitte geben Sie die Daten für das neue Ereignis ein.",
   eraBC: "v.Chr.",

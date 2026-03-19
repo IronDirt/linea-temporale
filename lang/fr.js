@@ -31,15 +31,18 @@ window.__i18n_fr = {
   zoomControlsLabel: "Contrôles de zoom de la chronologie",
   localResetTitleText: "Nouvelle chronologie",
   closeLabel: "Fermer",
-  localResetText1: "Cette action supprimera la chronologie uniquement localement (appareil/navigateur actuel).",
+  localResetText1:
+    "Cette action supprimera la chronologie uniquement localement (appareil/navigateur actuel).",
   localResetText2: "La version en ligne ne sera pas supprimée.",
-  localResetText3: "Avant de continuer, il est recommandé de télécharger la chronologie ou de la sauvegarder en ligne.",
+  localResetText3:
+    "Avant de continuer, il est recommandé de télécharger la chronologie ou de la sauvegarder en ligne.",
   localResetDownloadText: "Télécharger",
   localResetSaveOnlineText: "Sauvegarder en ligne",
   localResetConfirmText: "Supprimer localement uniquement",
   localResetDeleteOnlineText: "Supprimer en ligne",
   localResetAdminLinkLabel: "Lien administrateur",
-  localResetAdminLinkPlaceholder: "Sauvegarder en ligne pour obtenir le lien administrateur",
+  localResetAdminLinkPlaceholder:
+    "Sauvegarder en ligne pour obtenir le lien administrateur",
   mobileViewerActionsLabel: "Actions du visualisateur mobile",
   mobileViewerMenuOpenLabel: "Ouvrir les actions du visualisateur",
   mobileViewerMenuCloseLabel: "Fermer les actions du visualisateur",
@@ -91,7 +94,8 @@ window.__i18n_fr = {
   imageRemovedPending: "Image supprimée (sauvegarder pour confirmer)",
   saveOnlineError: "Échec de la sauvegarde en ligne.",
   cannotCopyLink: "Impossible de copier le lien automatiquement.",
-  noOnlineTimeline: "Aucune chronologie en ligne trouvée. Sauvegardez d'abord la chronologie en ligne avant de la supprimer.",
+  noOnlineTimeline:
+    "Aucune chronologie en ligne trouvée. Sauvegardez d'abord la chronologie en ligne avant de la supprimer.",
   invalidTimelineFile: "Le fichier ne contient pas une chronologie valide.",
   insertEventData: "Veuillez saisir les données du nouvel événement.",
   eraBC: "av. J.-C.",
