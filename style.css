@@ -1441,6 +1441,7 @@ body.presentation-mode .timeline-text {
 
   body.viewer-mode .mobile-viewer-menu-wrap {
     display: flex;
+    bottom: calc(92px + env(safe-area-inset-bottom, 0px));
   }
 
   body:not(.viewer-mode) .mobile-viewer-menu-wrap {
@@ -1499,6 +1500,39 @@ body.presentation-mode:not(.viewer-mode) .site-footer {
 
 body.viewer-mode .timeline-zoom-controls {
   margin-right: 12px;
+}
+
+@media (min-width: 901px) {
+  body.viewer-mode {
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  body.viewer-mode .container {
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  body.viewer-mode .timeline-section {
+    width: min(100%, 1800px);
+    min-height: 0;
+    max-height: 100%;
+  }
+
+  body.viewer-mode .timeline {
+    min-height: 0;
+    height: 100%;
+  }
+
+  body.viewer-mode .timeline-item {
+    min-height: 0;
+    max-height: calc(100dvh - 180px);
+  }
+
+  body.viewer-mode .timeline-item-content {
+    overflow-y: auto;
+  }
 }
 
 /* Desktop fullscreen: contenuto adattato alla dimensione dello schermo */
