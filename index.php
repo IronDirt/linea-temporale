@@ -320,7 +320,21 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 	<link rel="stylesheet" href="style-desktop.css" media="(min-width: 901px)">
 </head>
 <body>
-	<button type="button" id="langToggleBtn" class="lang-toggle-btn" aria-label="Switch to English" title="Switch to English">EN</button>
+	<div class="lang-menu-wrap">
+		<button type="button" id="langToggleBtn" class="lang-toggle-btn" aria-label="Switch language" title="Switch language">EN</button>
+		<div id="langMenu" class="lang-menu hidden">
+			<button type="button" class="lang-menu-btn" data-lang="it">Italiano</button>
+			<button type="button" class="lang-menu-btn" data-lang="en">English</button>
+			<button type="button" class="lang-menu-btn" data-lang="es">Español</button>
+			<button type="button" class="lang-menu-btn" data-lang="de">Deutsch</button>
+			<button type="button" class="lang-menu-btn" data-lang="fr">Français</button>
+			<button type="button" class="lang-menu-btn" data-lang="pt">Português</button>
+			<button type="button" class="lang-menu-btn" data-lang="ru">Русский</button>
+			<button type="button" class="lang-menu-btn" data-lang="tr">Türkçe</button>
+			<button type="button" class="lang-menu-btn" data-lang="ja">日本語</button>
+			<button type="button" class="lang-menu-btn" data-lang="zh">中文</button>
+		</div>
+	</div>
 	<div class="container">
 		<div class="top-content">
 			<h1 data-i18n="appTitle">Linea Temporale</h1>
@@ -575,5 +589,13 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 	<script src="lang/it.js"></script>
 	<script src="lang/en.js"></script>
 	<script src="app.js"></script>
+	<script src="lang/es.js"></script>
+	<script src="lang/de.js"></script>
+	<script src="lang/fr.js"></script>
+	<script src="lang/pt.js"></script>
+	<script src="lang/ru.js"></script>
+	<script src="lang/tr.js"></script>
+	<script src="lang/ja.js"></script>
+	<script src="lang/zh.js"></script>
 </body>
 </html>
