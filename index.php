@@ -316,6 +316,8 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 	}
 	</script>
 	<link rel="stylesheet" href="style.css">
+	<link rel="stylesheet" href="style-mobile.css" media="(max-width: 900px)">
+	<link rel="stylesheet" href="style-desktop.css" media="(min-width: 901px)">
 </head>
 <body>
 	<div class="container">

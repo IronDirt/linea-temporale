@@ -1,0 +1,53 @@
+@media (min-width: 901px) {
+  body.viewer-mode {
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  body.viewer-mode .container {
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  body.viewer-mode .timeline-section {
+    width: min(100%, 1800px);
+    min-height: 0;
+    max-height: 100%;
+  }
+
+  body.viewer-mode .timeline {
+    min-height: 0;
+    height: 100%;
+  }
+
+  body.viewer-mode .timeline-item {
+    min-height: 0;
+    max-height: calc(100dvh - 180px);
+  }
+
+  body.viewer-mode .timeline-item-content {
+    overflow-y: auto;
+  }
+}
+
+@media (min-width: 901px) {
+  :fullscreen body {
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  :fullscreen .container {
+    height: 100dvh;
+    min-height: unset;
+    overflow: hidden;
+  }
+
+  :fullscreen .timeline-section {
+    min-height: unset;
+  }
+
+  :fullscreen .timeline {
+    min-height: unset;
+  }
+}
