@@ -1340,6 +1340,33 @@ body.theme-dark .site-footer a {
   color: #4b5563;
 }
 
+.lang-toggle-btn {
+  position: fixed;
+  top: 12px;
+  right: 16px;
+  z-index: 100;
+  padding: 5px 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  border-radius: 6px;
+  background: #d4ccc0;
+  color: #4b4338;
+  border: none;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.lang-toggle-btn:focus-visible {
+  outline: 2px solid #93c5fd;
+  outline-offset: 2px;
+}
+
+body.theme-dark .lang-toggle-btn {
+  background: #1e293b;
+  color: #c7d2fe;
+}
+
 body.presentation-mode:not(.viewer-mode) .site-footer {
   display: none;
 }

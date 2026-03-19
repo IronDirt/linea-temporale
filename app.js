@@ -1,3 +1,120 @@
+	const LANG_KEY = 'timeline_lang_v1';
+
+	function detectLang() {
+		const stored = localStorage.getItem(LANG_KEY);
+		if (stored === 'it' || stored === 'en') {
+			return stored;
+		}
+		return (navigator.language || '').toLowerCase().startsWith('it') ? 'it' : 'en';
+	}
+
+	let currentLang = detectLang();
+
+	function t(key) {
+		const dict = currentLang === 'it' ? window.__i18n_it : window.__i18n_en;
+		return (dict && key in dict) ? dict[key] : key;
+	}
+
+	function applyTranslations() {
+		document.documentElement.lang = currentLang;
+		document.querySelectorAll('[data-i18n]').forEach((el) => {
+			el.textContent = t(el.dataset.i18n);
+		});
+		document.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
+			el.placeholder = t(el.dataset.i18nPlaceholder);
+		});
+		document.querySelectorAll('[data-i18n-aria-label]').forEach((el) => {
+			el.setAttribute('aria-label', t(el.dataset.i18nAriaLabel));
+		});
+
+		function set(id, prop, key) {
+			const el = document.getElementById(id);
+			if (!el) { return; }
+			const value = t(key);
+			if (prop === 'text') { el.textContent = value; }
+			else if (prop === 'aria') { el.setAttribute('aria-label', value); }
+			else if (prop === 'title') { el.title = value; }
+			else if (prop === 'placeholder') { el.placeholder = value; }
+			else if (prop === 'alt') { el.alt = value; }
+		}
+
+		set('openFormBtn', 'aria', 'addEventLabel');
+		set('backupMenu', 'aria', 'backupMenuAriaLabel');
+		set('adminLinkInput', 'placeholder', 'adminLinkPlaceholder');
+		set('copyAdminLinkBtn', 'aria', 'copyAdminLinkLabel');
+		set('copyAdminLinkBtn', 'title', 'copyAdminLinkLabel');
+		set('viewerLinkInput', 'placeholder', 'viewerLinkPlaceholder');
+		set('copyViewerLinkBtn', 'aria', 'copyViewerLinkLabel');
+		set('copyViewerLinkBtn', 'title', 'copyViewerLinkLabel');
+		set('downloadBtn', 'text', 'downloadBtnText');
+		set('uploadBtn', 'text', 'importBtnText');
+		set('saveOnlineBtn', 'text', 'saveBtnText');
+		set('resetTimelineBtn', 'aria', 'resetTimelineLabel');
+		set('resetTimelineBtn', 'title', 'resetTimelineTitle');
+		set('editTimelineTitleBtn', 'aria', 'editTitleLabel');
+		set('editTimelineTitleBtn', 'title', 'editTitleTitle');
+		set('viewerCreateBtn', 'text', 'viewerCreateBtnText');
+		set('viewerDownloadBtn', 'aria', 'viewerDownloadLabel');
+		set('viewerDownloadBtn', 'title', 'viewerDownloadLabel');
+		set('viewerActions', 'aria', 'viewerActionsLabel');
+		set('zoomOutBtn', 'aria', 'zoomOutLabel');
+		set('zoomOutBtn', 'title', 'zoomOutTitle');
+		set('zoomInBtn', 'aria', 'zoomInLabel');
+		set('zoomInBtn', 'title', 'zoomInTitle');
+		set('localResetTitle', 'text', 'localResetTitleText');
+		set('closeLocalResetBtn', 'aria', 'closeLabel');
+		set('localResetDownloadBtn', 'text', 'localResetDownloadText');
+		set('localResetSaveOnlineBtn', 'text', 'localResetSaveOnlineText');
+		set('localResetConfirmBtn', 'text', 'localResetConfirmText');
+		set('localResetDeleteOnlineBtn', 'text', 'localResetDeleteOnlineText');
+		set('localResetAdminLinkInput', 'placeholder', 'localResetAdminLinkPlaceholder');
+		set('localResetCopyAdminLinkBtn', 'aria', 'copyAdminLinkLabel');
+		set('localResetCopyAdminLinkBtn', 'title', 'copyAdminLinkLabel');
+		set('mobileViewerMenuWrap', 'aria', 'mobileViewerActionsLabel');
+		set('mobileViewerCreateBtn', 'text', 'viewerCreateBtnText');
+		set('mobileViewerZoomInBtn', 'aria', 'zoomInLabel');
+		set('mobileViewerZoomInBtn', 'title', 'zoomInTitle');
+		set('mobileViewerZoomOutBtn', 'aria', 'zoomOutLabel');
+		set('mobileViewerZoomOutBtn', 'title', 'zoomOutTitle');
+		set('mobileViewerDownloadBtn', 'aria', 'viewerDownloadLabel');
+		set('mobileViewerDownloadBtn', 'title', 'viewerDownloadLabel');
+		set('closeModalBtn', 'aria', 'closeLabel');
+		set('eventImageTrigger', 'text', 'chooseImageText');
+		set('removeEventImageBtn', 'text', 'removeImageText');
+		set('eventImageName', 'text', 'noFileSelected');
+		set('eventCustomYear', 'placeholder', 'customYearPlaceholder');
+		set('eventTitle', 'placeholder', 'titlePlaceholder');
+		set('eventText', 'placeholder', 'textPlaceholder');
+		set('eventImagePreview', 'alt', 'imagePreviewAlt');
+
+		const isEditing = Number.parseInt(document.getElementById('editIndex')?.value, 10) >= 0;
+		set('saveEventBtn', 'text', isEditing ? 'updateEventText' : 'addEventText');
+		set('modalTitle', 'text', isEditing ? 'modalEditEventTitle' : 'modalNewEventTitle');
+
+		const langBtn = document.getElementById('langToggleBtn');
+		if (langBtn) {
+			langBtn.textContent = t('langToggleLabel');
+			langBtn.title = t('langToggleTitle');
+			langBtn.setAttribute('aria-label', t('langToggleTitle'));
+		}
+	}
+
+	function initLangToggle() {
+		const langBtn = document.getElementById('langToggleBtn');
+		if (!langBtn) {
+			return;
+		}
+		langBtn.addEventListener('click', () => {
+			currentLang = currentLang === 'it' ? 'en' : 'it';
+			localStorage.setItem(LANG_KEY, currentLang);
+			applyTranslations();
+			applyTheme(currentTheme);
+			updateFullscreenState();
+			closeMobileViewerMenu();
+			renderTimeline();
+		});
+	}
+
 	const STORAGE_KEY = 'timeline_app_data_v1';
 	const THEME_KEY = 'timeline_theme_v1';
 	const TIMELINE_TITLE_KEY = 'timeline_title_v1';
@@ -245,13 +362,13 @@
 		const isDark = currentTheme === 'dark';
 		themeMoonIcon.classList.toggle('hidden', isDark);
 		themeSunIcon.classList.toggle('hidden', !isDark);
-		themeToggleBtn.title = isDark ? 'Tema chiaro' : 'Tema scuro';
-		themeToggleBtn.setAttribute('aria-label', isDark ? 'Passa al tema chiaro' : 'Passa al tema scuro');
+		themeToggleBtn.title = isDark ? t('themeTitleLight') : t('themeTitleDark');
+		themeToggleBtn.setAttribute('aria-label', isDark ? t('themeArialabelLight') : t('themeArialabelDark'));
 		if (mobileViewerThemeBtn) {
 			mobileViewerThemeMoonIcon.classList.toggle('hidden', isDark);
 			mobileViewerThemeSunIcon.classList.toggle('hidden', !isDark);
-			mobileViewerThemeBtn.title = isDark ? 'Tema chiaro' : 'Tema scuro';
-			mobileViewerThemeBtn.setAttribute('aria-label', isDark ? 'Passa al tema chiaro' : 'Passa al tema scuro');
+			mobileViewerThemeBtn.title = isDark ? t('themeTitleLight') : t('themeTitleDark');
+			mobileViewerThemeBtn.setAttribute('aria-label', isDark ? t('themeArialabelLight') : t('themeArialabelDark'));
 		}
 	}
 
@@ -303,8 +420,8 @@
 		mobileViewerMenuBtn.classList.toggle('is-open', willOpen);
 		mobileViewerMenuOpenIcon.classList.toggle('hidden', willOpen);
 		mobileViewerMenuCloseIcon.classList.toggle('hidden', !willOpen);
-		mobileViewerMenuBtn.setAttribute('aria-label', willOpen ? 'Chiudi azioni visualizzatore' : 'Apri azioni visualizzatore');
-		mobileViewerMenuBtn.title = willOpen ? 'Chiudi azioni visualizzatore' : 'Azioni visualizzatore';
+		mobileViewerMenuBtn.setAttribute('aria-label', willOpen ? t('mobileViewerMenuCloseLabel') : t('mobileViewerMenuOpenLabel'));
+		mobileViewerMenuBtn.title = willOpen ? t('mobileViewerMenuCloseLabel') : t('mobileViewerMenuTitle');
 	}
 
 	function closeMobileViewerMenu() {
@@ -313,8 +430,8 @@
 		mobileViewerMenuBtn.classList.remove('is-open');
 		mobileViewerMenuOpenIcon.classList.remove('hidden');
 		mobileViewerMenuCloseIcon.classList.add('hidden');
-		mobileViewerMenuBtn.setAttribute('aria-label', 'Apri azioni visualizzatore');
-		mobileViewerMenuBtn.title = 'Azioni visualizzatore';
+		mobileViewerMenuBtn.setAttribute('aria-label', t('mobileViewerMenuOpenLabel'));
+		mobileViewerMenuBtn.title = t('mobileViewerMenuTitle');
 	}
 
 	function goToNewEmptyTimeline() {
@@ -341,17 +458,17 @@
 		document.body.classList.toggle('presentation-mode', isFullscreen || isViewerMode());
 		fullscreenEnterIcon.classList.toggle('hidden', isFullscreen);
 		fullscreenExitIcon.classList.toggle('hidden', !isFullscreen);
-		fullscreenBtn.title = isFullscreen ? 'Esci da schermo intero' : 'Attiva schermo intero';
-		fullscreenBtn.setAttribute('aria-label', isFullscreen ? 'Esci da schermo intero' : 'Attiva schermo intero');
+		fullscreenBtn.title = isFullscreen ? t('fullscreenExitTitle') : t('fullscreenEnterTitle');
+		fullscreenBtn.setAttribute('aria-label', isFullscreen ? t('fullscreenExitTitle') : t('fullscreenEnterTitle'));
 		if (viewerFullscreenBtn) {
-			viewerFullscreenBtn.title = isFullscreen ? 'Esci da schermo intero' : 'Attiva schermo intero';
-			viewerFullscreenBtn.setAttribute('aria-label', isFullscreen ? 'Esci da schermo intero' : 'Attiva schermo intero');
+			viewerFullscreenBtn.title = isFullscreen ? t('fullscreenExitTitle') : t('fullscreenEnterTitle');
+			viewerFullscreenBtn.setAttribute('aria-label', isFullscreen ? t('fullscreenExitTitle') : t('fullscreenEnterTitle'));
 			viewerFullscreenEnterIcon.classList.toggle('hidden', isFullscreen);
 			viewerFullscreenExitIcon.classList.toggle('hidden', !isFullscreen);
 		}
 		if (mobileViewerFullscreenBtn) {
-			mobileViewerFullscreenBtn.title = isFullscreen ? 'Esci da schermo intero' : 'Attiva schermo intero';
-			mobileViewerFullscreenBtn.setAttribute('aria-label', isFullscreen ? 'Esci da schermo intero' : 'Attiva schermo intero');
+			mobileViewerFullscreenBtn.title = isFullscreen ? t('fullscreenExitTitle') : t('fullscreenEnterTitle');
+			mobileViewerFullscreenBtn.setAttribute('aria-label', isFullscreen ? t('fullscreenExitTitle') : t('fullscreenEnterTitle'));
 			mobileViewerFullscreenEnterIcon.classList.toggle('hidden', isFullscreen);
 			mobileViewerFullscreenExitIcon.classList.toggle('hidden', !isFullscreen);
 		}
@@ -399,11 +516,11 @@
 
 	function formatYearWithEra(year, eraTag) {
 		if (eraTag === 'christian') {
-			return `${Math.abs(year)} ${year < 0 ? 'a.C.' : 'd.C.'}`;
+			return `${Math.abs(year)} ${year < 0 ? t('eraBC') : t('eraAD')}`;
 		}
 
 		if (eraTag === 'common-era') {
-			return `${Math.abs(year)} ${year < 0 ? 'a.E.V.' : 'E.V.'}`;
+			return `${Math.abs(year)} ${year < 0 ? t('eraBCE') : t('eraCE')}`;
 		}
 
 		return String(year);
@@ -486,7 +603,7 @@
 		updateResetTimelineButton();
 
 		if (!timelineData.length) {
-			timelineEl.innerHTML = '<p class="empty">Nessun evento inserito.</p>';
+			timelineEl.innerHTML = `<p class="empty">${t('noEventsText')}</p>`;
 			updateZoomButtons();
 			updateTimelineLineWidth();
 			return;
@@ -520,15 +637,15 @@
 				});
 
 			item.innerHTML = `
-				<button type="button" class="timeline-pin-btn${isPinned ? ' is-pinned' : ''}" data-action="pin" data-index="${originalIndex}" aria-label="${isPinned ? 'Rimuovi appuntatura evento' : 'Appunta evento'}" title="${isPinned ? 'Rimuovi appuntatura' : 'Appunta evento'}"><img class="timeline-pin-icon" src="pin-icon.png" alt="" loading="lazy" decoding="async"></button>
+				<button type="button" class="timeline-pin-btn${isPinned ? ' is-pinned' : ''}" data-action="pin" data-index="${originalIndex}" aria-label="${isPinned ? t('pinRemoveLabel') : t('pinAddLabel')}" title="${isPinned ? t('pinRemoveTitle') : t('pinAddTitle')}"><img class="timeline-pin-icon" src="pin-icon.png" alt="" loading="lazy" decoding="async"></button>
 				<div class="timeline-item-content">
 					<div class="timeline-date">${formattedDate}</div>
 					${imageBlock}
 					<h3 class="timeline-title">${escapeHtml(eventItem.title)}</h3>
 					<p class="timeline-text">${escapeHtml(eventItem.text)}</p>
 					<div class="item-actions">
-						<button type="button" class="secondary" data-action="edit" data-index="${originalIndex}">Modifica</button>
-						<button type="button" class="danger" data-action="delete" data-index="${originalIndex}">Elimina</button>
+						<button type="button" class="secondary" data-action="edit" data-index="${originalIndex}">${t('editEventText')}</button>
+						<button type="button" class="danger" data-action="delete" data-index="${originalIndex}">${t('deleteEventText')}</button>
 					</div>
 				</div>
 			`;
@@ -755,7 +872,7 @@
 		const originalLabel = triggerButton ? triggerButton.textContent : '';
 		let saveSucceeded = false;
 		if (triggerButton) {
-			triggerButton.textContent = 'Salvataggio...';
+			triggerButton.textContent = t('savingLabel');
 		}
 
 		try {
@@ -784,7 +901,7 @@
 			viewerLinkInput.value = typeof result.viewerUrl === 'string' ? result.viewerUrl : '';
 			persistOnlineShareState();
 			saveSucceeded = true;
-			showStatus('Timeline salvata online.');
+			showStatus(t('savedOnlineStatus'));
 			if (typeof onSuccess === 'function') {
 				onSuccess(result);
 			}
@@ -795,7 +912,7 @@
 				setPersistentActionSuccess(triggerButton, successLabel);
 			}
 		} catch (error) {
-			window.alert(error instanceof Error ? error.message : 'Errore durante il salvataggio online.');
+			window.alert(error instanceof Error ? error.message : t('saveOnlineError'));
 		} finally {
 			buttonsToDisable.forEach((button) => {
 				button.disabled = false;
@@ -808,13 +925,13 @@
 
 	async function deleteOnlineTimeline() {
 		if (!sharedTimelineId || !sharedAdminToken) {
-			window.alert('Nessuna timeline online trovata. Salva prima la timeline online per poterla cancellare.');
+			window.alert(t('noOnlineTimeline'));
 			return;
 		}
 
 		localResetDeleteOnlineBtn.disabled = true;
 		const originalLabel = localResetDeleteOnlineBtn.textContent;
-		localResetDeleteOnlineBtn.textContent = 'Cancellazione...';
+		localResetDeleteOnlineBtn.textContent = t('deletingLabel');
 
 		try {
 			const response = await fetch('?api=delete', {
@@ -838,7 +955,7 @@
 			viewerLinkInput.value = '';
 			persistOnlineShareState();
 			updateLocalResetAdminLinkPanel();
-			showStatus('Timeline cancellata online.');
+			showStatus(t('deletedOnlineStatus'));
 			setPersistentActionSuccess(localResetDeleteOnlineBtn, 'Cancellato online');
 		} catch (error) {
 			window.alert(error instanceof Error ? error.message : 'Errore durante la cancellazione online.');
@@ -922,7 +1039,7 @@
 				buttonElement.classList.remove('is-copied');
 			}, 1200);
 		} catch (error) {
-			window.alert('Impossibile copiare il link automaticamente.');
+			window.alert(t('cannotCopyLink'));
 		}
 	}
 
@@ -938,12 +1055,12 @@
 		eventTitleInput.value = '';
 		eventTextInput.value = '';
 		eventImageInput.value = '';
-		eventImageName.textContent = 'Nessun file selezionato';
+		eventImageName.textContent = t('noFileSelected');
 		removeImageOnSave = false;
 		removeEventImageBtn.classList.add('hidden');
 		hideImagePreview();
-		saveEventBtn.textContent = 'Aggiungi evento';
-		modalTitle.textContent = 'Nuovo evento';
+		saveEventBtn.textContent = t('addEventText');
+		modalTitle.textContent = t('modalNewEventTitle');
 	}
 
 	function openModal() {
@@ -1069,7 +1186,7 @@
 		a.remove();
 
 		URL.revokeObjectURL(url);
-		showStatus('File JSON scaricato.');
+		showStatus(t('downloadedStatus'));
 	}
 
 	eventForm.addEventListener('submit', async (event) => {
@@ -1088,7 +1205,7 @@
 
 		const hasInvalidCustomYear = useCustomYear && !Number.isInteger(customYear);
 		if ((!useCustomYear && !date) || hasInvalidCustomYear || !title || !text) {
-			showStatus('Compila data, titolo e testo.', true);
+			showStatus(t('fillRequiredStatus'), true);
 			return;
 		}
 
@@ -1122,7 +1239,7 @@
 				imageData: nextImageData,
 				pinned: Boolean(previous.pinned)
 			};
-			showStatus('Evento aggiornato con successo.');
+			showStatus(t('eventUpdatedStatus'));
 		} else {
 			timelineData.push({
 				id: crypto.randomUUID(),
@@ -1137,7 +1254,7 @@
 				imageData,
 				pinned: false
 			});
-			showStatus('Evento aggiunto con successo.');
+			showStatus(t('eventAddedStatus'));
 		}
 
 		await saveToLocal();
@@ -1150,7 +1267,7 @@
 		resetForm();
 		openModal();
 		closeBackupMenu();
-		showStatus('Inserisci i dati del nuovo evento.');
+		showStatus(t('insertEventData'));
 	});
 
 	backupMenuBtn.addEventListener('click', (event) => {
@@ -1357,7 +1474,7 @@
 			eventTextInput.value = eventItem.text;
 			eventImageInput.value = '';
 			removeImageOnSave = false;
-			eventImageName.textContent = eventItem.imageData ? 'Immagine già presente' : 'Nessun file selezionato';
+			eventImageName.textContent = eventItem.imageData ? t('imageAlreadyPresent') : t('noFileSelected');
 			if (eventItem.imageData) {
 				hideImagePreview();
 				showImagePreview(eventItem.imageData);
@@ -1366,10 +1483,10 @@
 				hideImagePreview();
 				removeEventImageBtn.classList.add('hidden');
 			}
-			saveEventBtn.textContent = 'Aggiorna evento';
-			modalTitle.textContent = 'Modifica evento';
+			saveEventBtn.textContent = t('updateEventText');
+			modalTitle.textContent = t('modalEditEventTitle');
 			openModal();
-			showStatus('Modalità modifica attiva: aggiorna e salva.');
+			showStatus(t('editModeStatus'));
 		}
 
 		if (action === 'delete') {
@@ -1377,7 +1494,7 @@
 			saveToLocal();
 			renderTimeline();
 			resetForm();
-			showStatus('Evento eliminato.');
+			showStatus(t('eventDeletedStatus'));
 		}
 	});
 
@@ -1403,7 +1520,7 @@
 			const importedEvents = Array.isArray(parsed) ? parsed : parsed.events;
 
 			if (!Array.isArray(importedEvents)) {
-				throw new Error('Il file non contiene una timeline valida.');
+				throw new Error(t('invalidTimelineFile'));
 			}
 
 			timelineData = normalizeImportedEvents(importedEvents);
@@ -1411,9 +1528,9 @@
 			await saveToLocal();
 			renderTimeline();
 			resetForm();
-			showStatus('File importato correttamente.');
+			showStatus(t('importedOKStatus'));
 		} catch (error) {
-			showStatus(error.message || 'Errore durante l\'importazione.', true);
+			showStatus(error.message || t('importErrorStatus'), true);
 		} finally {
 			uploadInput.value = '';
 		}
@@ -1421,7 +1538,7 @@
 
 	eventImageInput.addEventListener('change', () => {
 		const file = eventImageInput.files[0];
-		eventImageName.textContent = file ? `Immagine selezionata: ${file.name}` : 'Nessun file selezionato';
+		eventImageName.textContent = file ? `${t('imageSelectedText')} ${file.name}` : t('noFileSelected');
 		removeImageOnSave = false;
 		if (file || Number.parseInt(editIndexInput.value, 10) >= 0) {
 			removeEventImageBtn.classList.remove('hidden');
@@ -1446,8 +1563,8 @@
 		eventImageInput.value = '';
 		removeImageOnSave = Number.parseInt(editIndexInput.value, 10) >= 0;
 		eventImageName.textContent = removeImageOnSave
-			? 'Immagine rimossa (salva per confermare)'
-			: 'Nessun file selezionato';
+			? t('imageRemovedPending')
+			: t('noFileSelected');
 		hideImagePreview();
 		if (!removeImageOnSave) {
 			removeEventImageBtn.classList.add('hidden');
@@ -1455,6 +1572,8 @@
 	});
 
 	(async function init() {
+		applyTranslations();
+		initLangToggle();
 		applyTheme(loadTheme());
 		applyAppMode();
 		updateFullscreenState();
@@ -1465,6 +1584,6 @@
 		await loadFromLocal();
 		renderTimeline();
 		updateTimelineLineWidth();
-		showStatus('Pronto. I dati vengono salvati nel browser.');
+		showStatus(t('readyStatus'));
 		document.getElementById('copyrightYear').textContent = new Date().getFullYear();
 	})();

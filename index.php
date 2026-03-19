@@ -320,9 +320,10 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 	<link rel="stylesheet" href="style-desktop.css" media="(min-width: 901px)">
 </head>
 <body>
+	<button type="button" id="langToggleBtn" class="lang-toggle-btn" aria-label="Switch to English" title="Switch to English">EN</button>
 	<div class="container">
 		<div class="top-content">
-			<h1>Linea Temporale</h1>
+			<h1 data-i18n="appTitle">Linea Temporale</h1>
 			<div class="fab-stack top-actions">
 				<button type="button" class="fab-add" id="openFormBtn" aria-label="Aggiungi nuovo evento">+</button>
 				<div class="backup-wrap">
@@ -336,7 +337,7 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 					<div class="backup-menu hidden" id="backupMenu" role="menu" aria-label="Menu backup">
 						<div class="online-save-panel" id="onlineSavePanel">
 							<div class="online-save-field">
-								<label for="adminLinkInput">Link admin</label>
+								<label data-i18n="adminLinkLabel" for="adminLinkInput">Link admin</label>
 								<div class="online-save-input-row">
 									<input id="adminLinkInput" type="text" readonly placeholder="Link admin (vuoto finché non salvi)">
 									<button type="button" class="secondary copy-link-btn" id="copyAdminLinkBtn" aria-label="Copia link admin" title="Copia link admin">
@@ -348,7 +349,7 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 								</div>
 							</div>
 							<div class="online-save-field">
-								<label for="viewerLinkInput">Link solo visualizzatore</label>
+								<label data-i18n="viewerLinkLabel" for="viewerLinkInput">Link solo visualizzatore</label>
 								<div class="online-save-input-row">
 									<input id="viewerLinkInput" type="text" readonly placeholder="Link pubblico (vuoto finché non salvi)">
 									<button type="button" class="secondary copy-link-btn" id="copyViewerLinkBtn" aria-label="Copia link visualizzatore" title="Copia link visualizzatore">
@@ -421,7 +422,7 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 							</svg>
 						</button>
 					</div>
-					<div class="timeline-zoom-controls" aria-label="Controlli zoom timeline">
+						<div class="timeline-zoom-controls" data-i18n-aria-label="zoomControlsLabel" aria-label="Controlli zoom timeline">
 						<button type="button" class="muted timeline-zoom-btn" id="zoomOutBtn" aria-label="Riduci dettagli timeline" title="Riduci dettagli">−</button>
 						<button type="button" class="muted timeline-zoom-btn" id="zoomInBtn" aria-label="Aumenta dettagli timeline" title="Aumenta dettagli">+</button>
 					</div>
@@ -438,12 +439,12 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 		<div class="modal-backdrop" id="localResetBackdrop"></div>
 		<section class="modal-card local-reset-card">
 			<div class="modal-header">
-				<h2 id="localResetTitle">Nuova linea temporale</h2>
+					<h2 id="localResetTitle">Nuova linea temporale</h2>
 				<button type="button" class="muted close-btn" id="closeLocalResetBtn" aria-label="Chiudi">✕</button>
 			</div>
-			<p class="local-reset-text">Questa azione cancellerà la timeline solo in locale (dispositivo/browser attuale).</p>
-            <p class="local-reset-text">La versione online non verrà eliminata.</p>
-			<p class="local-reset-text">Prima di procedere, si consiglia di scaricare la linea temporale o salvarla online.</p>
+			<p class="local-reset-text" data-i18n="localResetText1">Questa azione cancellerà la timeline solo in locale (dispositivo/browser attuale).</p>
+			<p class="local-reset-text" data-i18n="localResetText2">La versione online non verrà eliminata.</p>
+			<p class="local-reset-text" data-i18n="localResetText3">Prima di procedere, si consiglia di scaricare la linea temporale o salvarla online.</p>
 			<div class="local-reset-actions">
 				<button type="button" class="secondary" id="localResetDownloadBtn">Scarica</button>
 				<button type="button" class="secondary" id="localResetSaveOnlineBtn">Salva online</button>
@@ -451,7 +452,7 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 				<button type="button" class="danger" id="localResetDeleteOnlineBtn">Cancella online</button>
 			</div>
 			<div class="local-reset-online-panel online-save-field hidden" id="localResetAdminLinkWrap">
-				<label for="localResetAdminLinkInput">Link admin</label>
+				<label data-i18n="localResetAdminLinkLabel" for="localResetAdminLinkInput">Link admin</label>
 				<div class="online-save-input-row">
 					<input type="text" id="localResetAdminLinkInput" readonly placeholder="Salva online per ottenere il link admin">
 					<button type="button" class="muted copy-link-btn" id="localResetCopyAdminLinkBtn" aria-label="Copia link admin" title="Copia link admin">
@@ -516,40 +517,40 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 			<form id="eventForm">
 				<input type="hidden" id="editIndex" value="-1">
 
-				<label for="eventDate">Data</label>
+				<label data-i18n="dateLabel" for="eventDate">Data</label>
 				<input id="eventDate" type="date" required>
 				<div class="date-visibility-options">
 					<label class="checkbox-inline" for="eventShowDay">
 						<input id="eventShowDay" type="checkbox" checked>
-						Mostra giorno
+						<span data-i18n="showDayText">Mostra giorno</span>
 					</label>
 					<label class="checkbox-inline" for="eventShowMonth">
 						<input id="eventShowMonth" type="checkbox" checked>
-						Mostra mese
+						<span data-i18n="showMonthText">Mostra mese</span>
 					</label>
 				</div>
 				<div class="date-visibility-options">
 					<label class="checkbox-inline" for="eventUseCustomYear">
 						<input id="eventUseCustomYear" type="checkbox">
-						Usa anno personalizzato
+						<span data-i18n="useCustomYearText">Usa anno personalizzato</span>
 					</label>
 					<input id="eventCustomYear" class="year-input hidden" type="number" step="1" placeholder="Es. -500">
 				</div>
 
-				<label for="eventEraTag">Targhetta era</label>
+				<label data-i18n="eraTagLabel" for="eventEraTag">Targhetta era</label>
 				<select id="eventEraTag">
-					<option value="none">Nessuna</option>
-					<option value="christian">a.C. / d.C.</option>
-					<option value="common-era">a.E.V. / E.V.</option>
+					<option value="none" data-i18n="eraNoneOption">Nessuna</option>
+					<option value="christian" data-i18n="eraChristianOption">a.C. / d.C.</option>
+					<option value="common-era" data-i18n="eraCommonEraOption">a.E.V. / E.V.</option>
 				</select>
 
-				<label for="eventTitle">Titolo</label>
+				<label data-i18n="titleLabel" for="eventTitle">Titolo</label>
 				<input id="eventTitle" type="text" placeholder="Es. Inizio progetto" required>
 
-				<label for="eventText">Testo</label>
+				<label data-i18n="textLabel" for="eventText">Testo</label>
 				<textarea id="eventText" placeholder="Descrizione evento" required></textarea>
 
-				<label for="eventImage">Immagine (opzionale)</label>
+				<label data-i18n="imageLabel" for="eventImage">Immagine (opzionale)</label>
 				<div class="image-picker-row">
 					<label id="eventImageTrigger" for="eventImage" class="button-like secondary image-picker-btn">Scegli immagine</label>
 					<button type="button" id="removeEventImageBtn" class="muted image-remove-btn hidden">Rimuovi immagine</button>
@@ -571,6 +572,8 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 		const APP_MODE = <?php echo json_encode($appMode, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>;
 		const SHARED_TIMELINE_PAYLOAD = <?php echo json_encode($sharedPayload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>;
 	</script>
+	<script src="lang/it.js"></script>
+	<script src="lang/en.js"></script>
 	<script src="app.js"></script>
 </body>
 </html>
