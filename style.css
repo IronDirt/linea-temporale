@@ -44,6 +44,7 @@ body.modal-open {
 h1 {
   margin: 0 0 10px;
   font-size: 1.8rem;
+  color: #3a2f22;
 }
 
 p.subtitle {
@@ -248,6 +249,40 @@ button,
   width: 100%;
 }
 
+.timeline-right-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.viewer-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.viewer-action-btn {
+  padding: 8px 10px;
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+.viewer-icon-btn {
+  width: 38px;
+  height: 38px;
+  padding: 0;
+}
+
+.viewer-action-icon {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .timeline-header {
   display: flex;
   align-items: center;
@@ -258,6 +293,7 @@ button,
 
 .timeline-header h2 {
   margin: 0;
+  color: #3a2f22;
 }
 
 .timeline-title-edit {
@@ -302,7 +338,7 @@ button,
 }
 
 .timeline-item {
-  --timeline-item-width: clamp(230px, 24vw, 360px);
+  --timeline-item-width: clamp(300px, 30vw, 320px);
   position: relative;
   background: #dfdbd2;
   border: none;
@@ -427,10 +463,11 @@ button,
 }
 
 .timeline-title {
-  margin: 3px 0 6px;
+  margin: 12px 0 6px;
   font-weight: 700;
   font-size: 1rem;
   color: #2f2c26;
+  overflow-wrap: anywhere;
 }
 
 .timeline-text {
@@ -438,6 +475,8 @@ button,
   padding: 8px 0;
   white-space: pre-wrap;
   color: #4d473f;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .timeline-image {
@@ -482,6 +521,7 @@ button,
   background: #7a6750;
   color: #f2ece2;
   box-shadow: none;
+  margin-right: 4px;
 }
 
 .fab-add:hover {
@@ -645,13 +685,26 @@ button,
   margin: 0;
   font-size: 0.8rem;
   font-weight: 600;
-  color: #475569;
+  color: #5a4d3f;
   align-self: flex-start;
 }
 
 .online-save-field input[type="text"] {
   padding: 8px 10px;
   font-size: 0.82rem;
+  background: #d4ccc0;
+  border: 1px solid #bdb3a5;
+  color: #4a3a2a;
+}
+
+.online-save-field input[type="text"]::placeholder {
+  color: #7b6d5e;
+}
+
+.online-save-field input[type="text"]:focus {
+  border-color: #8f7b63;
+  background: #ddd5c8;
+  box-shadow: 0 0 0 2px rgba(122, 103, 80, 0.2);
 }
 
 .online-save-input-row {
@@ -705,7 +758,7 @@ button,
 .modal-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(17, 24, 39, 0.55);
+  background: rgba(51, 41, 31, 0.42);
 }
 
 .modal-card {
@@ -715,7 +768,7 @@ button,
   overflow: auto;
   background: #dfdbd2;
   border-radius: 14px;
-  border: none;
+  border: 1px solid #c8c1b5;
   padding: 16px;
   box-shadow: none;
 }
@@ -725,11 +778,14 @@ button,
   justify-content: space-between;
   align-items: center;
   gap: 12px;
-  margin-bottom: 2px;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #c8c1b5;
 }
 
 .modal-header h2 {
   margin: 0;
+  color: #3a2f22;
 }
 
 .close-btn {
@@ -877,6 +933,22 @@ body.theme-dark .online-save-field label {
   color: #cbd5e1;
 }
 
+body.theme-dark .online-save-field input[type="text"] {
+  background: #0b1220;
+  border: 1px solid #334155;
+  color: #e5e7eb;
+}
+
+body.theme-dark .online-save-field input[type="text"]::placeholder {
+  color: #8fa0b8;
+}
+
+body.theme-dark .online-save-field input[type="text"]:focus {
+  border-color: #60a5fa;
+  background: #0f172a;
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2);
+}
+
 body.theme-dark .copy-link-btn.is-copied {
   background: #1e3a8a;
   color: #bfdbfe;
@@ -886,6 +958,19 @@ body.theme-dark .modal-backdrop {
   background: rgba(2, 6, 23, 0.75);
 }
 
+body.theme-dark .modal-card {
+  background: #0f172a;
+  border: 1px solid #334155;
+}
+
+body.theme-dark .modal-header {
+  border-bottom-color: #334155;
+}
+
+body.theme-dark .modal-header h2 {
+  color: #e5e7eb;
+}
+
 body.presentation-mode .fab-stack,
 body.presentation-mode .item-actions,
 body.presentation-mode .top-toolbar {
@@ -893,7 +978,7 @@ body.presentation-mode .top-toolbar {
 }
 
 body.presentation-mode .container {
-  padding: 12px 20px;
+  padding: 0;
   justify-content: center;
 }
 
@@ -924,6 +1009,8 @@ body.presentation-mode .timeline {
   min-height: clamp(420px, 74dvh, 920px);
   align-items: stretch;
   gap: var(--timeline-gap, 18px);
+  padding-left: 14px;
+  padding-right: 14px;
 }
 
 body.presentation-mode .timeline-item {
@@ -948,7 +1035,7 @@ body.presentation-mode .timeline-text {
   }
 
   .container {
-    padding: 12px 0 84px;
+    padding: 0;
   }
 
   .timeline-section {
@@ -973,6 +1060,16 @@ body.presentation-mode .timeline-text {
 
   .timeline-topbar {
     padding-right: 10px;
+  }
+
+  .timeline-right-controls {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .viewer-actions {
+    flex-wrap: wrap;
+    justify-content: flex-end;
   }
 
   .timeline-section h2 {

@@ -341,12 +341,32 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 		<section class="card timeline-section">
 			<div class="timeline-topbar">
 				<div class="timeline-header">
-					<h2 id="timelineTitle">Timeline</h2>
 					<button type="button" class="muted timeline-title-edit" id="editTimelineTitleBtn" aria-label="Modifica titolo timeline" title="Modifica titolo">✎</button>
+					<h2 id="timelineTitle">Timeline</h2>
 				</div>
-				<div class="timeline-zoom-controls" aria-label="Controlli zoom timeline">
-					<button type="button" class="muted timeline-zoom-btn" id="zoomOutBtn" aria-label="Riduci dettagli timeline" title="Riduci dettagli">−</button>
-					<button type="button" class="muted timeline-zoom-btn" id="zoomInBtn" aria-label="Aumenta dettagli timeline" title="Aumenta dettagli">+</button>
+				<div class="timeline-right-controls">
+					<div class="viewer-actions hidden" id="viewerActions" aria-label="Azioni visualizzatore">
+						<button type="button" class="primary viewer-action-btn" id="viewerCreateBtn">Crea la tua linea temporale</button>
+						<button type="button" class="secondary viewer-action-btn viewer-icon-btn" id="viewerDownloadBtn" aria-label="Scarica timeline" title="Scarica timeline">
+							<svg class="viewer-action-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+								<path d="M12 3v10"></path>
+								<path d="M8 10l4 4 4-4"></path>
+								<path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"></path>
+							</svg>
+						</button>
+						<button type="button" class="secondary viewer-action-btn viewer-icon-btn" id="viewerFullscreenBtn" aria-label="Attiva schermo intero" title="Attiva schermo intero">
+							<svg class="viewer-action-icon" id="viewerFullscreenEnterIcon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+								<path d="M8 3H3v5M16 3h5v5M21 16v5h-5M3 16v5h5"></path>
+							</svg>
+							<svg class="viewer-action-icon hidden" id="viewerFullscreenExitIcon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+								<path d="M9 3H3v6M15 3h6v6M21 15v6h-6M3 15v6h6"></path>
+							</svg>
+						</button>
+					</div>
+					<div class="timeline-zoom-controls" aria-label="Controlli zoom timeline">
+						<button type="button" class="muted timeline-zoom-btn" id="zoomOutBtn" aria-label="Riduci dettagli timeline" title="Riduci dettagli">−</button>
+						<button type="button" class="muted timeline-zoom-btn" id="zoomInBtn" aria-label="Aumenta dettagli timeline" title="Aumenta dettagli">+</button>
+					</div>
 				</div>
 			</div>
 			<div id="timeline" class="timeline"></div>
@@ -464,6 +484,12 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 		const editTimelineTitleBtn = document.getElementById('editTimelineTitleBtn');
 		const zoomOutBtn = document.getElementById('zoomOutBtn');
 		const zoomInBtn = document.getElementById('zoomInBtn');
+		const viewerActions = document.getElementById('viewerActions');
+		const viewerFullscreenBtn = document.getElementById('viewerFullscreenBtn');
+		const viewerFullscreenEnterIcon = document.getElementById('viewerFullscreenEnterIcon');
+		const viewerFullscreenExitIcon = document.getElementById('viewerFullscreenExitIcon');
+		const viewerDownloadBtn = document.getElementById('viewerDownloadBtn');
+		const viewerCreateBtn = document.getElementById('viewerCreateBtn');
 		const openFormBtn = document.getElementById('openFormBtn');
 		const backupMenuBtn = document.getElementById('backupMenuBtn');
 		const backupMenu = document.getElementById('backupMenu');
@@ -665,6 +691,7 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 			editTimelineTitleBtn.classList.add('hidden');
 			fullscreenBtn.classList.add('hidden');
 			themeToggleBtn.classList.add('hidden');
+			viewerActions.classList.remove('hidden');
 			document.body.classList.add('presentation-mode');
 		}
 
@@ -690,6 +717,12 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 			fullscreenExitIcon.classList.toggle('hidden', !isFullscreen);
 			fullscreenBtn.title = isFullscreen ? 'Esci da schermo intero' : 'Attiva schermo intero';
 			fullscreenBtn.setAttribute('aria-label', isFullscreen ? 'Esci da schermo intero' : 'Attiva schermo intero');
+			if (viewerFullscreenBtn) {
+				viewerFullscreenBtn.title = isFullscreen ? 'Esci da schermo intero' : 'Attiva schermo intero';
+				viewerFullscreenBtn.setAttribute('aria-label', isFullscreen ? 'Esci da schermo intero' : 'Attiva schermo intero');
+				viewerFullscreenEnterIcon.classList.toggle('hidden', isFullscreen);
+				viewerFullscreenExitIcon.classList.toggle('hidden', !isFullscreen);
+			}
 		}
 
 		function updateTimelineLineWidth() {
@@ -1169,6 +1202,27 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 			});
 		}
 
+		function downloadTimelineData() {
+			const payload = {
+				exportedAt: new Date().toISOString(),
+				version: 1,
+				events: timelineData
+			};
+
+			const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+			const url = URL.createObjectURL(blob);
+
+			const a = document.createElement('a');
+			a.href = url;
+			a.download = 'timeline-data.json';
+			document.body.appendChild(a);
+			a.click();
+			a.remove();
+
+			URL.revokeObjectURL(url);
+			showStatus('File JSON scaricato.');
+		}
+
 		eventForm.addEventListener('submit', async (event) => {
 			event.preventDefault();
 
@@ -1320,6 +1374,26 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 			}
 		});
 
+		viewerFullscreenBtn.addEventListener('click', async () => {
+			try {
+				if (!document.fullscreenElement) {
+					await document.documentElement.requestFullscreen();
+				} else {
+					await document.exitFullscreen();
+				}
+			} catch (error) {
+				console.error('Errore modalità schermo intero (viewer):', error);
+			}
+		});
+
+		viewerDownloadBtn.addEventListener('click', () => {
+			downloadTimelineData();
+		});
+
+		viewerCreateBtn.addEventListener('click', () => {
+			window.location.href = window.location.pathname;
+		});
+
 		document.addEventListener('fullscreenchange', updateFullscreenState);
 		window.addEventListener('resize', updateTimelineLineWidth);
 
@@ -1420,24 +1494,7 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 
 		downloadBtn.addEventListener('click', () => {
 			closeBackupMenu();
-			const payload = {
-				exportedAt: new Date().toISOString(),
-				version: 1,
-				events: timelineData
-			};
-
-			const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-			const url = URL.createObjectURL(blob);
-
-			const a = document.createElement('a');
-			a.href = url;
-			a.download = 'timeline-data.json';
-			document.body.appendChild(a);
-			a.click();
-			a.remove();
-
-			URL.revokeObjectURL(url);
-			showStatus('File JSON scaricato.');
+			downloadTimelineData();
 		});
 
 		uploadInput.addEventListener('change', async () => {
