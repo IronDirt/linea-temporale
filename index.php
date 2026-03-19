@@ -339,6 +339,14 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 		</div>
 
 		<section class="card timeline-section">
+			<button type="button" class="muted timeline-reset-btn hidden" id="resetTimelineBtn" aria-label="Crea nuova linea temporale locale" title="Nuova linea temporale (solo locale)">
+				<svg class="timeline-reset-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+					<path d="M3 6h18"></path>
+					<path d="M8 6V4h8v2"></path>
+					<path d="M6 6l1 14h10l1-14"></path>
+					<path d="M10 10v7M14 10v7"></path>
+				</svg>
+			</button>
 			<div class="timeline-topbar">
 				<div class="timeline-header">
 					<button type="button" class="muted timeline-title-edit" id="editTimelineTitleBtn" aria-label="Modifica titolo timeline" title="Modifica titolo">✎</button>
@@ -370,6 +378,83 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 				</div>
 			</div>
 			<div id="timeline" class="timeline"></div>
+		</section>
+	</div>
+
+	<div class="modal hidden" id="localResetModal" role="dialog" aria-modal="true" aria-labelledby="localResetTitle">
+		<div class="modal-backdrop" id="localResetBackdrop"></div>
+		<section class="modal-card local-reset-card">
+			<div class="modal-header">
+				<h2 id="localResetTitle">Nuova linea temporale</h2>
+				<button type="button" class="muted close-btn" id="closeLocalResetBtn" aria-label="Chiudi">✕</button>
+			</div>
+			<p class="local-reset-text">Questa azione cancellerà la timeline solo in locale (dispositivo/browser attuale).</p>
+            <p class="local-reset-text">La versione online non verrà eliminata.</p>
+			<p class="local-reset-text">Prima di procedere, si consiglia di scaricare la linea temporale o salvarla online.</p>
+			<div class="local-reset-actions">
+				<button type="button" class="secondary" id="localResetDownloadBtn">Scarica</button>
+				<button type="button" class="secondary" id="localResetSaveOnlineBtn">Salva online</button>
+				<button type="button" class="danger" id="localResetConfirmBtn">Cancella solo locale</button>
+				<button type="button" class="muted" id="localResetCancelBtn">Annulla</button>
+			</div>
+		</section>
+	</div>
+
+	<div class="mobile-viewer-menu-wrap hidden" id="mobileViewerMenuWrap" aria-label="Azioni visualizzatore mobile">
+		<button type="button" class="primary mobile-viewer-action-btn mobile-viewer-create-btn hidden" id="mobileViewerCreateBtn">Crea la tua linea temporale</button>
+		<div class="mobile-viewer-menu hidden" id="mobileViewerMenu">
+			<button type="button" class="muted mobile-viewer-icon-btn" id="mobileViewerZoomInBtn" aria-label="Aumenta dettagli timeline" title="Aumenta dettagli">+</button>
+			<button type="button" class="muted mobile-viewer-icon-btn" id="mobileViewerZoomOutBtn" aria-label="Riduci dettagli timeline" title="Riduci dettagli">−</button>
+			<button type="button" class="secondary mobile-viewer-icon-btn" id="mobileViewerThemeBtn" aria-label="Tema scuro" title="Tema scuro">
+				<svg class="viewer-action-icon" id="mobileViewerThemeMoonIcon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+					<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 1 0 9.8 9.8z"></path>
+				</svg>
+				<svg class="viewer-action-icon hidden" id="mobileViewerThemeSunIcon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+					<circle cx="12" cy="12" r="4"></circle>
+					<path d="M12 2v2.5M12 19.5V22M4.93 4.93l1.77 1.77M17.3 17.3l1.77 1.77M2 12h2.5M19.5 12H22M4.93 19.07l1.77-1.77M17.3 6.7l1.77-1.77"></path>
+				</svg>
+			</button>
+			<button type="button" class="secondary mobile-viewer-icon-btn" id="mobileViewerFullscreenBtn" aria-label="Attiva schermo intero" title="Attiva schermo intero">
+				<svg class="viewer-action-icon" id="mobileViewerFullscreenEnterIcon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+					<path d="M8 3H3v5M16 3h5v5M21 16v5h-5M3 16v5h5"></path>
+				</svg>
+				<svg class="viewer-action-icon hidden" id="mobileViewerFullscreenExitIcon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+					<path d="M9 3H3v6M15 3h6v6M21 15v6h-6M3 15v6h6"></path>
+				</svg>
+			</button>
+			<button type="button" class="secondary mobile-viewer-icon-btn" id="mobileViewerDownloadBtn" aria-label="Scarica timeline" title="Scarica timeline">
+				<svg class="viewer-action-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+					<path d="M12 3v10"></path>
+					<path d="M8 10l4 4 4-4"></path>
+					<path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"></path>
+				</svg>
+			</button>
+		</div>
+		<button type="button" class="mobile-viewer-menu-btn" id="mobileViewerMenuBtn" aria-label="Apri azioni visualizzatore" title="Azioni visualizzatore">
+			<svg class="backup-icon" id="mobileViewerMenuOpenIcon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+				<path d="M4 7h16M4 12h16M4 17h16"></path>
+			</svg>
+			<svg class="backup-icon hidden" id="mobileViewerMenuCloseIcon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+				<path d="M6 6l12 12M18 6L6 18"></path>
+			</svg>
+		</button>
+	</div>
+
+	<div class="modal hidden" id="localResetModal" role="dialog" aria-modal="true" aria-labelledby="localResetTitle">
+		<div class="modal-backdrop" id="localResetBackdrop"></div>
+		<section class="modal-card local-reset-card">
+			<div class="modal-header">
+				<h2 id="localResetTitle">Nuova linea temporale</h2>
+				<button type="button" class="muted close-btn" id="closeLocalResetBtn" aria-label="Chiudi">✕</button>
+			</div>
+			<p class="local-reset-text">Questa azione cancellerà la timeline solo in locale (dispositivo/browser attuale). La versione online non verrà eliminata.</p>
+			<p class="local-reset-text">Prima di procedere, si consiglia di scaricare la linea temporale o salvarla online.</p>
+			<div class="local-reset-actions">
+				<button type="button" class="secondary" id="localResetDownloadBtn">Scarica</button>
+				<button type="button" class="secondary" id="localResetSaveOnlineBtn">Salva online</button>
+				<button type="button" class="danger" id="localResetConfirmBtn">Cancella solo locale</button>
+				<button type="button" class="muted" id="localResetCancelBtn">Annulla</button>
+			</div>
 		</section>
 	</div>
 
@@ -430,7 +515,6 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 
 				<div class="form-actions">
 					<button type="submit" class="primary" id="saveEventBtn">Aggiungi evento</button>
-					<button type="button" class="muted" id="clearFormBtn">Pulisci</button>
 				</div>
 			</form>
 		</section>
@@ -463,7 +547,6 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 		const eventImageName = document.getElementById('eventImageName');
 		const eventImagePreviewWrap = document.getElementById('eventImagePreviewWrap');
 		const eventImagePreview = document.getElementById('eventImagePreview');
-		const clearFormBtn = document.getElementById('clearFormBtn');
 		const saveEventBtn = document.getElementById('saveEventBtn');
 		const fullscreenBtn = document.getElementById('fullscreenBtn');
 		const fullscreenEnterIcon = document.getElementById('fullscreenEnterIcon');
@@ -484,12 +567,28 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 		const editTimelineTitleBtn = document.getElementById('editTimelineTitleBtn');
 		const zoomOutBtn = document.getElementById('zoomOutBtn');
 		const zoomInBtn = document.getElementById('zoomInBtn');
+		const resetTimelineBtn = document.getElementById('resetTimelineBtn');
 		const viewerActions = document.getElementById('viewerActions');
 		const viewerFullscreenBtn = document.getElementById('viewerFullscreenBtn');
 		const viewerFullscreenEnterIcon = document.getElementById('viewerFullscreenEnterIcon');
 		const viewerFullscreenExitIcon = document.getElementById('viewerFullscreenExitIcon');
 		const viewerDownloadBtn = document.getElementById('viewerDownloadBtn');
 		const viewerCreateBtn = document.getElementById('viewerCreateBtn');
+		const mobileViewerMenuWrap = document.getElementById('mobileViewerMenuWrap');
+		const mobileViewerMenuBtn = document.getElementById('mobileViewerMenuBtn');
+		const mobileViewerMenuOpenIcon = document.getElementById('mobileViewerMenuOpenIcon');
+		const mobileViewerMenuCloseIcon = document.getElementById('mobileViewerMenuCloseIcon');
+		const mobileViewerMenu = document.getElementById('mobileViewerMenu');
+		const mobileViewerCreateBtn = document.getElementById('mobileViewerCreateBtn');
+		const mobileViewerDownloadBtn = document.getElementById('mobileViewerDownloadBtn');
+		const mobileViewerFullscreenBtn = document.getElementById('mobileViewerFullscreenBtn');
+		const mobileViewerFullscreenEnterIcon = document.getElementById('mobileViewerFullscreenEnterIcon');
+		const mobileViewerFullscreenExitIcon = document.getElementById('mobileViewerFullscreenExitIcon');
+		const mobileViewerThemeBtn = document.getElementById('mobileViewerThemeBtn');
+		const mobileViewerThemeMoonIcon = document.getElementById('mobileViewerThemeMoonIcon');
+		const mobileViewerThemeSunIcon = document.getElementById('mobileViewerThemeSunIcon');
+		const mobileViewerZoomOutBtn = document.getElementById('mobileViewerZoomOutBtn');
+		const mobileViewerZoomInBtn = document.getElementById('mobileViewerZoomInBtn');
 		const openFormBtn = document.getElementById('openFormBtn');
 		const backupMenuBtn = document.getElementById('backupMenuBtn');
 		const backupMenu = document.getElementById('backupMenu');
@@ -497,8 +596,16 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 		const closeModalBtn = document.getElementById('closeModalBtn');
 		const modalBackdrop = document.getElementById('modalBackdrop');
 		const modalTitle = document.getElementById('modalTitle');
+		const localResetModal = document.getElementById('localResetModal');
+		const localResetBackdrop = document.getElementById('localResetBackdrop');
+		const closeLocalResetBtn = document.getElementById('closeLocalResetBtn');
+		const localResetDownloadBtn = document.getElementById('localResetDownloadBtn');
+		const localResetSaveOnlineBtn = document.getElementById('localResetSaveOnlineBtn');
+		const localResetConfirmBtn = document.getElementById('localResetConfirmBtn');
+		const localResetCancelBtn = document.getElementById('localResetCancelBtn');
 		const APP_MODE = <?php echo json_encode($appMode, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>;
 		const SHARED_TIMELINE_PAYLOAD = <?php echo json_encode($sharedPayload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>;
+		const START_WITH_EMPTY_TIMELINE = new URLSearchParams(window.location.search).get('new') === '1';
 
 		let timelineData = [];
 		let currentTheme = 'light';
@@ -660,6 +767,12 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 			themeSunIcon.classList.toggle('hidden', !isDark);
 			themeToggleBtn.title = isDark ? 'Tema chiaro' : 'Tema scuro';
 			themeToggleBtn.setAttribute('aria-label', isDark ? 'Passa al tema chiaro' : 'Passa al tema scuro');
+			if (mobileViewerThemeBtn) {
+				mobileViewerThemeMoonIcon.classList.toggle('hidden', isDark);
+				mobileViewerThemeSunIcon.classList.toggle('hidden', !isDark);
+				mobileViewerThemeBtn.title = isDark ? 'Tema chiaro' : 'Tema scuro';
+				mobileViewerThemeBtn.setAttribute('aria-label', isDark ? 'Passa al tema chiaro' : 'Passa al tema scuro');
+			}
 		}
 
 		function loadTheme() {
@@ -691,8 +804,41 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 			editTimelineTitleBtn.classList.add('hidden');
 			fullscreenBtn.classList.add('hidden');
 			themeToggleBtn.classList.add('hidden');
+			resetTimelineBtn.classList.add('hidden');
 			viewerActions.classList.remove('hidden');
+			mobileViewerMenuWrap.classList.remove('hidden');
+			document.body.classList.add('viewer-mode');
 			document.body.classList.add('presentation-mode');
+		}
+
+		function updateResetTimelineButton() {
+			const shouldShow = !isViewerMode() && timelineData.length > 0;
+			resetTimelineBtn.classList.toggle('hidden', !shouldShow);
+		}
+
+		function toggleMobileViewerMenu() {
+			const willOpen = mobileViewerMenu.classList.contains('hidden');
+			mobileViewerMenu.classList.toggle('hidden');
+			mobileViewerCreateBtn.classList.toggle('hidden');
+			mobileViewerMenuBtn.classList.toggle('is-open', willOpen);
+			mobileViewerMenuOpenIcon.classList.toggle('hidden', willOpen);
+			mobileViewerMenuCloseIcon.classList.toggle('hidden', !willOpen);
+			mobileViewerMenuBtn.setAttribute('aria-label', willOpen ? 'Chiudi azioni visualizzatore' : 'Apri azioni visualizzatore');
+			mobileViewerMenuBtn.title = willOpen ? 'Chiudi azioni visualizzatore' : 'Azioni visualizzatore';
+		}
+
+		function closeMobileViewerMenu() {
+			mobileViewerMenu.classList.add('hidden');
+			mobileViewerCreateBtn.classList.add('hidden');
+			mobileViewerMenuBtn.classList.remove('is-open');
+			mobileViewerMenuOpenIcon.classList.remove('hidden');
+			mobileViewerMenuCloseIcon.classList.add('hidden');
+			mobileViewerMenuBtn.setAttribute('aria-label', 'Apri azioni visualizzatore');
+			mobileViewerMenuBtn.title = 'Azioni visualizzatore';
+		}
+
+		function goToNewEmptyTimeline() {
+			window.location.href = `${window.location.pathname}?new=1`;
 		}
 
 		function loadTimelineTitle() {
@@ -723,6 +869,37 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 				viewerFullscreenEnterIcon.classList.toggle('hidden', isFullscreen);
 				viewerFullscreenExitIcon.classList.toggle('hidden', !isFullscreen);
 			}
+			if (mobileViewerFullscreenBtn) {
+				mobileViewerFullscreenBtn.title = isFullscreen ? 'Esci da schermo intero' : 'Attiva schermo intero';
+				mobileViewerFullscreenBtn.setAttribute('aria-label', isFullscreen ? 'Esci da schermo intero' : 'Attiva schermo intero');
+				mobileViewerFullscreenEnterIcon.classList.toggle('hidden', isFullscreen);
+				mobileViewerFullscreenExitIcon.classList.toggle('hidden', !isFullscreen);
+			}
+		}
+
+		async function toggleFullscreenMode(logLabel = 'Errore modalità schermo intero:') {
+			try {
+				if (!document.fullscreenElement) {
+					await document.documentElement.requestFullscreen();
+				} else {
+					await document.exitFullscreen();
+				}
+			} catch (error) {
+				console.error(logLabel, error);
+			}
+		}
+
+		function handleZoomOut() {
+			if (!timelineData.length) {
+				return;
+			}
+			zoomLevel = Math.min(zoomLevel + 1, timelineData.length - 1);
+			applyZoomToTimeline({ preserveFocus: true, smooth: true });
+		}
+
+		function handleZoomIn() {
+			zoomLevel = Math.max(zoomLevel - 1, 0);
+			applyZoomToTimeline({ preserveFocus: true, smooth: true });
 		}
 
 		function updateTimelineLineWidth() {
@@ -826,6 +1003,8 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 		}
 
 		function renderTimeline() {
+			updateResetTimelineButton();
+
 			if (!timelineData.length) {
 				timelineEl.innerHTML = '<p class="empty">Nessun evento inserito.</p>';
 				updateZoomButtons();
@@ -878,6 +1057,7 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 			});
 
 			applyZoomToTimeline({ preserveFocus: false, smooth: false });
+			updateResetTimelineButton();
 		}
 
 		function escapeHtml(text) {
@@ -974,6 +1154,30 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 		}
 
 		async function loadFromLocal() {
+			if (START_WITH_EMPTY_TIMELINE) {
+				localStorage.removeItem(STORAGE_KEY);
+				localStorage.removeItem(SHARE_LINKS_KEY);
+				localStorage.removeItem(TIMELINE_TITLE_KEY);
+
+				if ('caches' in window) {
+					try {
+						const cache = await caches.open(CACHE_NAME);
+						await cache.delete(CACHE_URL);
+					} catch (error) {
+						console.error('Errore reset cache timeline:', error);
+					}
+				}
+
+				timelineData = [];
+				sharedTimelineId = null;
+				sharedAdminToken = null;
+				adminLinkInput.value = '';
+				viewerLinkInput.value = '';
+				setTimelineTitle('Timeline');
+				window.history.replaceState({}, '', window.location.pathname);
+				return;
+			}
+
 			if (SHARED_TIMELINE_PAYLOAD && typeof SHARED_TIMELINE_PAYLOAD === 'object') {
 				sharedTimelineId = typeof SHARED_TIMELINE_PAYLOAD.timelineId === 'string' ? SHARED_TIMELINE_PAYLOAD.timelineId : null;
 				sharedAdminToken = typeof SHARED_TIMELINE_PAYLOAD.adminToken === 'string' ? SHARED_TIMELINE_PAYLOAD.adminToken : null;
@@ -1065,6 +1269,46 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 			}
 		}
 
+		async function clearLocalTimelineData() {
+			const confirmed = window.confirm(
+				'Attenzione: questa azione cancellerà la linea temporale solo in locale (su questo dispositivo/browser).\n\n'
+				+ 'La versione online non verrà eliminata.\n'
+				+ 'Si consiglia di scaricare la linea o salvarla online prima di continuare.\n\n'
+				+ 'Vuoi continuare?'
+			);
+
+			if (!confirmed) {
+				return;
+			}
+
+			timelineData = [];
+			zoomLevel = 0;
+			sharedTimelineId = null;
+			sharedAdminToken = null;
+			adminLinkInput.value = '';
+			viewerLinkInput.value = '';
+
+			localStorage.removeItem(STORAGE_KEY);
+			localStorage.removeItem(SHARE_LINKS_KEY);
+			localStorage.removeItem(TIMELINE_TITLE_KEY);
+
+			if ('caches' in window) {
+				try {
+					const cache = await caches.open(CACHE_NAME);
+					await cache.delete(CACHE_URL);
+				} catch (error) {
+					console.error('Errore reset cache timeline:', error);
+				}
+			}
+
+			setTimelineTitle('Timeline');
+			resetForm();
+			closeModal();
+			closeLocalResetModal();
+			closeBackupMenu();
+			renderTimeline();
+		}
+
 		async function copyToClipboard(text) {
 			if (!text) {
 				return false;
@@ -1141,6 +1385,16 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 
 		function closeModal() {
 			eventModal.classList.add('hidden');
+			document.body.classList.remove('modal-open');
+		}
+
+		function openLocalResetModal() {
+			localResetModal.classList.remove('hidden');
+			document.body.classList.add('modal-open');
+		}
+
+		function closeLocalResetModal() {
+			localResetModal.classList.add('hidden');
 			document.body.classList.remove('modal-open');
 		}
 
@@ -1297,11 +1551,6 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 			closeModal();
 		});
 
-		clearFormBtn.addEventListener('click', () => {
-			resetForm();
-			showStatus('Form pulito.');
-		});
-
 		openFormBtn.addEventListener('click', () => {
 			resetForm();
 			openModal();
@@ -1337,17 +1586,28 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 			localStorage.setItem(THEME_KEY, nextTheme);
 		});
 
-		zoomOutBtn.addEventListener('click', () => {
-			if (!timelineData.length) {
-				return;
-			}
-			zoomLevel = Math.min(zoomLevel + 1, timelineData.length - 1);
-			applyZoomToTimeline({ preserveFocus: true, smooth: true });
+		zoomOutBtn.addEventListener('click', handleZoomOut);
+
+		zoomInBtn.addEventListener('click', handleZoomIn);
+
+		resetTimelineBtn.addEventListener('click', () => {
+			openLocalResetModal();
 		});
 
-		zoomInBtn.addEventListener('click', () => {
-			zoomLevel = Math.max(zoomLevel - 1, 0);
-			applyZoomToTimeline({ preserveFocus: true, smooth: true });
+		closeLocalResetBtn.addEventListener('click', closeLocalResetModal);
+		localResetCancelBtn.addEventListener('click', closeLocalResetModal);
+		localResetBackdrop.addEventListener('click', closeLocalResetModal);
+
+		localResetDownloadBtn.addEventListener('click', () => {
+			downloadTimelineData();
+		});
+
+		localResetSaveOnlineBtn.addEventListener('click', () => {
+			saveOnlineTimeline();
+		});
+
+		localResetConfirmBtn.addEventListener('click', () => {
+			clearLocalTimelineData();
 		});
 
 		editTimelineTitleBtn.addEventListener('click', () => {
@@ -1363,27 +1623,11 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 
 		fullscreenBtn.addEventListener('click', async () => {
 			closeBackupMenu();
-			try {
-				if (!document.fullscreenElement) {
-					await document.documentElement.requestFullscreen();
-				} else {
-					await document.exitFullscreen();
-				}
-			} catch (error) {
-				console.error('Errore modalità schermo intero:', error);
-			}
+			await toggleFullscreenMode('Errore modalità schermo intero:');
 		});
 
 		viewerFullscreenBtn.addEventListener('click', async () => {
-			try {
-				if (!document.fullscreenElement) {
-					await document.documentElement.requestFullscreen();
-				} else {
-					await document.exitFullscreen();
-				}
-			} catch (error) {
-				console.error('Errore modalità schermo intero (viewer):', error);
-			}
+			await toggleFullscreenMode('Errore modalità schermo intero (viewer):');
 		});
 
 		viewerDownloadBtn.addEventListener('click', () => {
@@ -1391,8 +1635,35 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 		});
 
 		viewerCreateBtn.addEventListener('click', () => {
-			window.location.href = window.location.pathname;
+			goToNewEmptyTimeline();
 		});
+
+		mobileViewerMenuBtn.addEventListener('click', (event) => {
+			event.stopPropagation();
+			toggleMobileViewerMenu();
+		});
+
+		mobileViewerFullscreenBtn.addEventListener('click', async () => {
+			await toggleFullscreenMode('Errore modalità schermo intero (viewer mobile):');
+		});
+
+		mobileViewerDownloadBtn.addEventListener('click', () => {
+			downloadTimelineData();
+		});
+
+		mobileViewerCreateBtn.addEventListener('click', () => {
+			goToNewEmptyTimeline();
+		});
+
+		mobileViewerThemeBtn.addEventListener('click', () => {
+			const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+			applyTheme(nextTheme);
+			localStorage.setItem(THEME_KEY, nextTheme);
+		});
+
+		mobileViewerZoomOutBtn.addEventListener('click', handleZoomOut);
+
+		mobileViewerZoomInBtn.addEventListener('click', handleZoomIn);
 
 		document.addEventListener('fullscreenchange', updateFullscreenState);
 		window.addEventListener('resize', updateTimelineLineWidth);
@@ -1405,8 +1676,13 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 				closeModal();
 			}
 
+			if (event.key === 'Escape' && !localResetModal.classList.contains('hidden')) {
+				closeLocalResetModal();
+			}
+
 			if (event.key === 'Escape') {
 				closeBackupMenu();
+				closeMobileViewerMenu();
 			}
 		});
 
@@ -1417,6 +1693,10 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 
 			if (!backupMenu.contains(event.target) && event.target !== backupMenuBtn) {
 				closeBackupMenu();
+			}
+
+			if (!mobileViewerMenuWrap.contains(event.target)) {
+				closeMobileViewerMenu();
 			}
 		});
 
