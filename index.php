@@ -253,6 +253,14 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 	<meta name="application-name" content="Timeline SalernoHub">
 	<meta name="theme-color" content="#2563eb">
 	<meta name="referrer" content="strict-origin-when-cross-origin">
+		<!-- Google tag (gtag.js) -->
+		<script async src="https://www.googletagmanager.com/gtag/js?id=G-R2QSCDWV2Q"></script>
+		<script>
+			window.dataLayer = window.dataLayer || [];
+			function gtag(){dataLayer.push(arguments);}
+			gtag('js', new Date());
+			gtag('config', 'G-R2QSCDWV2Q');
+		</script>
 	<link rel="alternate" href="https://timeline.salernohub.net/" hreflang="it-IT">
 	<script type="application/ld+json">
 	{
