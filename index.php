@@ -1,3 +1,168 @@
+<?php
+declare(strict_types=1);
+
+function timeline_storage_dir(): string
+{
+	return __DIR__ . '/shared-timelines';
+}
+
+function timeline_base_url(): string
+{
+	$scheme = 'http';
+	if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
+		$scheme = 'https';
+	}
+	if (!empty($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
+		$scheme = explode(',', $_SERVER['HTTP_X_FORWARDED_PROTO'])[0] === 'https' ? 'https' : $scheme;
+	}
+
+	$host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+	$path = $_SERVER['PHP_SELF'] ?? '/index.php';
+
+	return $scheme . '://' . $host . $path;
+}
+
+function timeline_generate_id(int $bytes = 6): string
+{
+	return bin2hex(random_bytes($bytes));
+}
+
+function timeline_build_share_urls(string $timelineId, string $adminToken, string $viewerToken): array
+{
+	$baseUrl = timeline_base_url();
+
+	return [
+		'adminUrl' => $baseUrl . '?timeline=' . rawurlencode($timelineId) . '&admin=' . rawurlencode($adminToken),
+		'viewerUrl' => $baseUrl . '?timeline=' . rawurlencode($timelineId) . '&view=' . rawurlencode($viewerToken)
+	];
+}
+
+$storageDir = timeline_storage_dir();
+if (!is_dir($storageDir)) {
+	mkdir($storageDir, 0775, true);
+}
+
+if (($_GET['api'] ?? '') === 'save' && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
+	header('Content-Type: application/json; charset=utf-8');
+
+	try {
+		$rawBody = file_get_contents('php://input');
+		$payload = json_decode($rawBody ?: '{}', true, 512, JSON_THROW_ON_ERROR);
+
+		$events = $payload['events'] ?? null;
+		$title = isset($payload['title']) && is_string($payload['title']) ? trim($payload['title']) : 'Timeline';
+		$timelineId = isset($payload['timelineId']) && is_string($payload['timelineId'])
+			? trim($payload['timelineId'])
+			: '';
+		$adminToken = isset($payload['adminToken']) && is_string($payload['adminToken'])
+			? trim($payload['adminToken'])
+			: '';
+
+		if (!is_array($events)) {
+			http_response_code(400);
+			echo json_encode([
+				'ok' => false,
+				'message' => 'Payload non valido: eventi mancanti.'
+			], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+			exit;
+		}
+
+		$existingData = null;
+		$isUpdate = false;
+		if ($timelineId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineId) === 1) {
+			$filePath = $storageDir . '/' . $timelineId . '.json';
+			if (is_file($filePath)) {
+				$content = file_get_contents($filePath);
+				$decoded = json_decode($content ?: '{}', true);
+				if (is_array($decoded) && isset($decoded['adminToken']) && hash_equals((string) $decoded['adminToken'], $adminToken)) {
+					$existingData = $decoded;
+					$isUpdate = true;
+				}
+			}
+		}
+
+		if (!$isUpdate) {
+			do {
+				$timelineId = timeline_generate_id(6);
+				$filePath = $storageDir . '/' . $timelineId . '.json';
+			} while (is_file($filePath));
+
+			$adminToken = timeline_generate_id(16);
+			$viewerToken = timeline_generate_id(16);
+		} else {
+			$filePath = $storageDir . '/' . $timelineId . '.json';
+			$adminToken = (string) ($existingData['adminToken'] ?? '');
+			$viewerToken = (string) ($existingData['viewerToken'] ?? '');
+		}
+
+		$record = [
+			'updatedAt' => date(DATE_ATOM),
+			'title' => $title !== '' ? $title : 'Timeline',
+			'events' => array_values($events),
+			'adminToken' => $adminToken,
+			'viewerToken' => $viewerToken,
+			'version' => 1
+		];
+
+		file_put_contents($filePath, json_encode($record, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+
+		$urls = timeline_build_share_urls($timelineId, $adminToken, $viewerToken);
+
+		echo json_encode([
+			'ok' => true,
+			'timelineId' => $timelineId,
+			'adminToken' => $adminToken,
+			'viewerToken' => $viewerToken,
+			'adminUrl' => $urls['adminUrl'],
+			'viewerUrl' => $urls['viewerUrl']
+		], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+		exit;
+	} catch (Throwable $error) {
+		http_response_code(500);
+		echo json_encode([
+			'ok' => false,
+			'message' => 'Errore durante il salvataggio online.'
+		], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+		exit;
+	}
+}
+
+$appMode = 'editor';
+$sharedPayload = null;
+
+$timelineQueryId = isset($_GET['timeline']) && is_string($_GET['timeline']) ? trim($_GET['timeline']) : '';
+$adminQueryToken = isset($_GET['admin']) && is_string($_GET['admin']) ? trim($_GET['admin']) : '';
+$viewerQueryToken = isset($_GET['view']) && is_string($_GET['view']) ? trim($_GET['view']) : '';
+
+if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) === 1) {
+	$filePath = $storageDir . '/' . $timelineQueryId . '.json';
+	if (is_file($filePath)) {
+		$content = file_get_contents($filePath);
+		$decoded = json_decode($content ?: '{}', true);
+
+		if (is_array($decoded)) {
+			$storedAdmin = (string) ($decoded['adminToken'] ?? '');
+			$storedViewer = (string) ($decoded['viewerToken'] ?? '');
+			$canEdit = $adminQueryToken !== '' && $storedAdmin !== '' && hash_equals($storedAdmin, $adminQueryToken);
+			$canView = $viewerQueryToken !== '' && $storedViewer !== '' && hash_equals($storedViewer, $viewerQueryToken);
+
+			if ($canEdit || $canView) {
+				$appMode = $canView && !$canEdit ? 'viewer' : 'editor';
+				$urls = timeline_build_share_urls($timelineQueryId, $storedAdmin, $storedViewer);
+				$sharedPayload = [
+					'timelineId' => $timelineQueryId,
+					'adminToken' => $canEdit ? $storedAdmin : null,
+					'viewerToken' => $canEdit ? $storedViewer : null,
+					'adminUrl' => $canEdit ? $urls['adminUrl'] : '',
+					'viewerUrl' => $urls['viewerUrl'],
+					'title' => isset($decoded['title']) && is_string($decoded['title']) ? $decoded['title'] : 'Timeline',
+					'events' => isset($decoded['events']) && is_array($decoded['events']) ? $decoded['events'] : []
+				];
+			}
+		}
+	}
+}
+?>
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -108,7 +273,69 @@
 	<div class="container">
 		<div class="top-content">
 			<h1>Linea Temporale</h1>
-			<p class="subtitle">Crea la tua linea temporale personalizzata</p>
+			<div class="fab-stack top-actions">
+				<button type="button" class="fab-add" id="openFormBtn" aria-label="Aggiungi nuovo evento">+</button>
+				<div class="backup-wrap">
+					<button type="button" class="fab-backup" id="backupMenuBtn" aria-label="Backup" title="Backup">
+						<svg class="backup-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+							<path d="M12 3v10"></path>
+							<path d="M8 10l4 4 4-4"></path>
+							<path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"></path>
+						</svg>
+					</button>
+					<div class="backup-menu hidden" id="backupMenu" role="menu" aria-label="Menu backup">
+						<div class="online-save-panel" id="onlineSavePanel">
+							<div class="online-save-field">
+								<label for="adminLinkInput">Link admin</label>
+								<div class="online-save-input-row">
+									<input id="adminLinkInput" type="text" readonly placeholder="Link admin (vuoto finché non salvi)">
+									<button type="button" class="secondary copy-link-btn" id="copyAdminLinkBtn" aria-label="Copia link admin" title="Copia link admin">
+										<svg class="copy-link-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+											<rect x="9" y="9" width="11" height="11" rx="2"></rect>
+											<rect x="4" y="4" width="11" height="11" rx="2"></rect>
+										</svg>
+									</button>
+								</div>
+							</div>
+							<div class="online-save-field">
+								<label for="viewerLinkInput">Link solo visualizzatore</label>
+								<div class="online-save-input-row">
+									<input id="viewerLinkInput" type="text" readonly placeholder="Link pubblico (vuoto finché non salvi)">
+									<button type="button" class="secondary copy-link-btn" id="copyViewerLinkBtn" aria-label="Copia link visualizzatore" title="Copia link visualizzatore">
+										<svg class="copy-link-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+											<rect x="9" y="9" width="11" height="11" rx="2"></rect>
+											<rect x="4" y="4" width="11" height="11" rx="2"></rect>
+										</svg>
+									</button>
+								</div>
+							</div>
+							<div class="backup-actions-row">
+								<button type="button" class="secondary" id="downloadBtn" role="menuitem">Scarica</button>
+								<button type="button" class="secondary" id="uploadBtn" role="menuitem">Importa</button>
+								<button type="button" class="primary" id="saveOnlineBtn" role="menuitem">Salva</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<button type="button" class="fab-fullscreen" id="fullscreenBtn" aria-label="Attiva schermo intero" title="Attiva schermo intero">
+					<svg class="fullscreen-icon" id="fullscreenEnterIcon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+						<path d="M8 3H3v5M16 3h5v5M21 16v5h-5M3 16v5h5"></path>
+					</svg>
+					<svg class="fullscreen-icon hidden" id="fullscreenExitIcon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+						<path d="M9 3H3v6M15 3h6v6M21 15v6h-6M3 15v6h6"></path>
+					</svg>
+				</button>
+				<button type="button" class="fab-theme" id="themeToggleBtn" aria-label="Tema scuro" title="Tema scuro">
+					<svg class="theme-icon theme-icon-moon" id="themeMoonIcon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+						<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 1 0 9.8 9.8z"></path>
+					</svg>
+					<svg class="theme-icon theme-icon-sun hidden" id="themeSunIcon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+						<circle cx="12" cy="12" r="4"></circle>
+						<path d="M12 2v2.5M12 19.5V22M4.93 4.93l1.77 1.77M17.3 17.3l1.77 1.77M2 12h2.5M19.5 12H22M4.93 19.07l1.77-1.77M17.3 6.7l1.77-1.77"></path>
+					</svg>
+				</button>
+				<input id="uploadInput" class="hidden" type="file" accept="application/json">
+			</div>
 		</div>
 
 		<section class="card timeline-section">
@@ -124,41 +351,6 @@
 			</div>
 			<div id="timeline" class="timeline"></div>
 		</section>
-	</div>
-
-	<div class="fab-stack">
-		<button type="button" class="fab-add" id="openFormBtn" aria-label="Aggiungi nuovo evento">+</button>
-		<div class="backup-wrap">
-			<button type="button" class="fab-backup" id="backupMenuBtn" aria-label="Backup" title="Backup">
-				<svg class="backup-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-					<path d="M12 3v10"></path>
-					<path d="M8 10l4 4 4-4"></path>
-					<path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"></path>
-				</svg>
-			</button>
-			<div class="backup-menu hidden" id="backupMenu" role="menu" aria-label="Menu backup">
-				<button type="button" class="secondary" id="downloadBtn" role="menuitem">Scarica</button>
-				<button type="button" class="secondary" id="uploadBtn" role="menuitem">Importa</button>
-			</div>
-		</div>
-		<button type="button" class="fab-fullscreen" id="fullscreenBtn" aria-label="Attiva schermo intero" title="Attiva schermo intero">
-			<svg class="fullscreen-icon" id="fullscreenEnterIcon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-				<path d="M8 3H3v5M16 3h5v5M21 16v5h-5M3 16v5h5"></path>
-			</svg>
-			<svg class="fullscreen-icon hidden" id="fullscreenExitIcon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-				<path d="M9 3H3v6M15 3h6v6M21 15v6h-6M3 15v6h6"></path>
-			</svg>
-		</button>
-		<button type="button" class="fab-theme" id="themeToggleBtn" aria-label="Tema scuro" title="Tema scuro">
-			<svg class="theme-icon theme-icon-moon" id="themeMoonIcon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-				<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 1 0 9.8 9.8z"></path>
-			</svg>
-			<svg class="theme-icon theme-icon-sun hidden" id="themeSunIcon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-				<circle cx="12" cy="12" r="4"></circle>
-				<path d="M12 2v2.5M12 19.5V22M4.93 4.93l1.77 1.77M17.3 17.3l1.77 1.77M2 12h2.5M19.5 12H22M4.93 19.07l1.77-1.77M17.3 6.7l1.77-1.77"></path>
-			</svg>
-		</button>
-		<input id="uploadInput" class="hidden" type="file" accept="application/json">
 	</div>
 
 	<div class="modal hidden" id="eventModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
@@ -228,6 +420,7 @@
 		const STORAGE_KEY = 'timeline_app_data_v1';
 		const THEME_KEY = 'timeline_theme_v1';
 		const TIMELINE_TITLE_KEY = 'timeline_title_v1';
+		const SHARE_LINKS_KEY = 'timeline_share_links_v1';
 		const CACHE_NAME = 'timeline_app_cache_v1';
 		const CACHE_URL = '/timeline-data.json';
 		const IMAGE_MAX_WIDTH = 1600;
@@ -260,6 +453,11 @@
 		const themeSunIcon = document.getElementById('themeSunIcon');
 		const downloadBtn = document.getElementById('downloadBtn');
 		const uploadBtn = document.getElementById('uploadBtn');
+		const saveOnlineBtn = document.getElementById('saveOnlineBtn');
+		const adminLinkInput = document.getElementById('adminLinkInput');
+		const viewerLinkInput = document.getElementById('viewerLinkInput');
+		const copyAdminLinkBtn = document.getElementById('copyAdminLinkBtn');
+		const copyViewerLinkBtn = document.getElementById('copyViewerLinkBtn');
 		const uploadInput = document.getElementById('uploadInput');
 		const timelineEl = document.getElementById('timeline');
 		const timelineTitleEl = document.getElementById('timelineTitle');
@@ -273,12 +471,16 @@
 		const closeModalBtn = document.getElementById('closeModalBtn');
 		const modalBackdrop = document.getElementById('modalBackdrop');
 		const modalTitle = document.getElementById('modalTitle');
+		const APP_MODE = <?php echo json_encode($appMode, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>;
+		const SHARED_TIMELINE_PAYLOAD = <?php echo json_encode($sharedPayload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>;
 
 		let timelineData = [];
 		let currentTheme = 'light';
 		let zoomLevel = 0;
 		let imagePreviewObjectUrl = '';
 		let removeImageOnSave = false;
+		let sharedTimelineId = null;
+		let sharedAdminToken = null;
 
 		function hideImagePreview() {
 			if (imagePreviewObjectUrl) {
@@ -448,6 +650,24 @@
 			return;
 		}
 
+		function isViewerMode() {
+			return APP_MODE === 'viewer';
+		}
+
+		function applyAppMode() {
+			const viewerMode = isViewerMode();
+			if (!viewerMode) {
+				return;
+			}
+
+			openFormBtn.classList.add('hidden');
+			backupMenuBtn.classList.add('hidden');
+			editTimelineTitleBtn.classList.add('hidden');
+			fullscreenBtn.classList.add('hidden');
+			themeToggleBtn.classList.add('hidden');
+			document.body.classList.add('presentation-mode');
+		}
+
 		function loadTimelineTitle() {
 			const savedTitle = localStorage.getItem(TIMELINE_TITLE_KEY);
 			if (!savedTitle || !savedTitle.trim()) {
@@ -465,7 +685,7 @@
 
 		function updateFullscreenState() {
 			const isFullscreen = Boolean(document.fullscreenElement);
-			document.body.classList.toggle('presentation-mode', isFullscreen);
+			document.body.classList.toggle('presentation-mode', isFullscreen || isViewerMode());
 			fullscreenEnterIcon.classList.toggle('hidden', isFullscreen);
 			fullscreenExitIcon.classList.toggle('hidden', !isFullscreen);
 			fullscreenBtn.title = isFullscreen ? 'Esci da schermo intero' : 'Attiva schermo intero';
@@ -611,8 +831,8 @@
 					<button type="button" class="timeline-pin-btn${isPinned ? ' is-pinned' : ''}" data-action="pin" data-index="${originalIndex}" aria-label="${isPinned ? 'Rimuovi appuntatura evento' : 'Appunta evento'}" title="${isPinned ? 'Rimuovi appuntatura' : 'Appunta evento'}"><img class="timeline-pin-icon" src="pin-icon.png" alt="" loading="lazy" decoding="async"></button>
 					<div class="timeline-item-content">
 						<div class="timeline-date">${formattedDate}</div>
-						<h3 class="timeline-title">${escapeHtml(eventItem.title)}</h3>
 						${imageBlock}
+						<h3 class="timeline-title">${escapeHtml(eventItem.title)}</h3>
 						<p class="timeline-text">${escapeHtml(eventItem.text)}</p>
 						<div class="item-actions">
 							<button type="button" class="secondary" data-action="edit" data-index="${originalIndex}">Modifica</button>
@@ -635,6 +855,67 @@
 				.replaceAll('"', '&quot;')
 				.replaceAll("'", '&#39;')
 				.replaceAll('\n', '<br>');
+		}
+
+		function normalizeImportedEvents(importedEvents) {
+			if (!Array.isArray(importedEvents)) {
+				return [];
+			}
+
+			return importedEvents.map((item) => ({
+				id: typeof item.id === 'string' ? item.id : crypto.randomUUID(),
+				date: typeof item.date === 'string' ? item.date : '',
+				useCustomYear: Boolean(item.useCustomYear),
+				customYear: Number.isInteger(item.customYear)
+					? item.customYear
+					: (typeof item.customYear === 'number' ? Math.trunc(item.customYear) : null),
+				eraTag: ['none', 'christian', 'common-era'].includes(item.eraTag)
+					? item.eraTag
+					: 'none',
+				showDay: item.showDay !== false,
+				showMonth: item.showMonth !== false,
+				title: typeof item.title === 'string' ? item.title : '',
+				text: typeof item.text === 'string' ? item.text : '',
+				imageData: typeof item.imageData === 'string' ? item.imageData : null,
+				pinned: Boolean(item.pinned)
+			})).filter((item) => (item.date || (item.useCustomYear && Number.isInteger(item.customYear))) && item.title && item.text);
+		}
+
+		function persistOnlineShareState() {
+			const payload = {
+				timelineId: sharedTimelineId,
+				adminToken: sharedAdminToken,
+				adminUrl: adminLinkInput.value.trim(),
+				viewerUrl: viewerLinkInput.value.trim()
+			};
+
+			localStorage.setItem(SHARE_LINKS_KEY, JSON.stringify(payload));
+		}
+
+		function restoreOnlineShareStateFromLocal() {
+			const raw = localStorage.getItem(SHARE_LINKS_KEY);
+			if (!raw) {
+				return;
+			}
+
+			try {
+				const parsed = JSON.parse(raw);
+				if (!parsed || typeof parsed !== 'object') {
+					return;
+				}
+
+				sharedTimelineId = typeof parsed.timelineId === 'string' && parsed.timelineId
+					? parsed.timelineId
+					: sharedTimelineId;
+				sharedAdminToken = typeof parsed.adminToken === 'string' && parsed.adminToken
+					? parsed.adminToken
+					: sharedAdminToken;
+
+				adminLinkInput.value = typeof parsed.adminUrl === 'string' ? parsed.adminUrl : '';
+				viewerLinkInput.value = typeof parsed.viewerUrl === 'string' ? parsed.viewerUrl : '';
+			} catch (error) {
+				console.error('Errore parsing share links localStorage:', error);
+			}
 		}
 
 		async function saveToLocal() {
@@ -660,6 +941,29 @@
 		}
 
 		async function loadFromLocal() {
+			if (SHARED_TIMELINE_PAYLOAD && typeof SHARED_TIMELINE_PAYLOAD === 'object') {
+				sharedTimelineId = typeof SHARED_TIMELINE_PAYLOAD.timelineId === 'string' ? SHARED_TIMELINE_PAYLOAD.timelineId : null;
+				sharedAdminToken = typeof SHARED_TIMELINE_PAYLOAD.adminToken === 'string' ? SHARED_TIMELINE_PAYLOAD.adminToken : null;
+				timelineData = normalizeImportedEvents(SHARED_TIMELINE_PAYLOAD.events || []);
+
+				if (typeof SHARED_TIMELINE_PAYLOAD.title === 'string' && SHARED_TIMELINE_PAYLOAD.title.trim()) {
+					setTimelineTitle(SHARED_TIMELINE_PAYLOAD.title.trim());
+				}
+
+				adminLinkInput.value = typeof SHARED_TIMELINE_PAYLOAD.adminUrl === 'string'
+					? SHARED_TIMELINE_PAYLOAD.adminUrl
+					: '';
+				viewerLinkInput.value = typeof SHARED_TIMELINE_PAYLOAD.viewerUrl === 'string'
+					? SHARED_TIMELINE_PAYLOAD.viewerUrl
+					: '';
+				if (!isViewerMode()) {
+					persistOnlineShareState();
+				}
+				return;
+			}
+
+			restoreOnlineShareStateFromLocal();
+
 			const raw = localStorage.getItem(STORAGE_KEY);
 			if (raw) {
 				try {
@@ -686,6 +990,93 @@
 				} catch (error) {
 					console.error('Errore lettura cache:', error);
 				}
+			}
+		}
+
+		async function saveOnlineTimeline() {
+			saveOnlineBtn.disabled = true;
+			const originalLabel = saveOnlineBtn.textContent;
+			saveOnlineBtn.textContent = 'Salvataggio...';
+
+			try {
+				const response = await fetch('?api=save', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						timelineId: sharedTimelineId,
+						adminToken: sharedAdminToken,
+						title: timelineTitleEl.textContent.trim() || 'Timeline',
+						events: timelineData
+					})
+				});
+
+				const result = await response.json();
+
+				if (!response.ok || !result.ok) {
+					throw new Error(result && result.message ? result.message : 'Salvataggio online non riuscito.');
+				}
+
+				sharedTimelineId = typeof result.timelineId === 'string' ? result.timelineId : sharedTimelineId;
+				sharedAdminToken = typeof result.adminToken === 'string' ? result.adminToken : sharedAdminToken;
+				adminLinkInput.value = typeof result.adminUrl === 'string' ? result.adminUrl : '';
+				viewerLinkInput.value = typeof result.viewerUrl === 'string' ? result.viewerUrl : '';
+				persistOnlineShareState();
+				showStatus('Timeline salvata online.');
+			} catch (error) {
+				window.alert(error instanceof Error ? error.message : 'Errore durante il salvataggio online.');
+			} finally {
+				saveOnlineBtn.disabled = false;
+				saveOnlineBtn.textContent = originalLabel;
+			}
+		}
+
+		async function copyToClipboard(text) {
+			if (!text) {
+				return false;
+			}
+
+			if (navigator.clipboard && window.isSecureContext) {
+				await navigator.clipboard.writeText(text);
+				return true;
+			}
+
+			const temporaryInput = document.createElement('textarea');
+			temporaryInput.value = text;
+			temporaryInput.setAttribute('readonly', 'true');
+			temporaryInput.style.position = 'fixed';
+			temporaryInput.style.top = '-9999px';
+			document.body.appendChild(temporaryInput);
+			temporaryInput.select();
+
+			let copied = false;
+			try {
+				copied = document.execCommand('copy');
+			} finally {
+				temporaryInput.remove();
+			}
+
+			return copied;
+		}
+
+		async function handleCopyLink(inputElement, buttonElement) {
+			const value = inputElement.value.trim();
+			if (!value) {
+				return;
+			}
+
+			try {
+				const copied = await copyToClipboard(value);
+				if (!copied) {
+					throw new Error('Copia non riuscita');
+				}
+				buttonElement.classList.add('is-copied');
+				window.setTimeout(() => {
+					buttonElement.classList.remove('is-copied');
+				}, 1200);
+			} catch (error) {
+				window.alert('Impossibile copiare il link automaticamente.');
 			}
 		}
 
@@ -874,6 +1265,18 @@
 			uploadInput.click();
 		});
 
+		saveOnlineBtn.addEventListener('click', () => {
+			saveOnlineTimeline();
+		});
+
+		copyAdminLinkBtn.addEventListener('click', () => {
+			handleCopyLink(adminLinkInput, copyAdminLinkBtn);
+		});
+
+		copyViewerLinkBtn.addEventListener('click', () => {
+			handleCopyLink(viewerLinkInput, copyViewerLinkBtn);
+		});
+
 		themeToggleBtn.addEventListener('click', () => {
 			const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
 			applyTheme(nextTheme);
@@ -944,6 +1347,10 @@
 		});
 
 		timelineEl.addEventListener('click', (event) => {
+			if (isViewerMode()) {
+				return;
+			}
+
 			const target = event.target;
 			if (!(target instanceof HTMLElement)) {
 				return;
@@ -1034,6 +1441,11 @@
 		});
 
 		uploadInput.addEventListener('change', async () => {
+			if (isViewerMode()) {
+				uploadInput.value = '';
+				return;
+			}
+
 			const file = uploadInput.files[0];
 			if (!file) {
 				return;
@@ -1048,23 +1460,7 @@
 					throw new Error('Il file non contiene una timeline valida.');
 				}
 
-				timelineData = importedEvents.map((item) => ({
-					id: typeof item.id === 'string' ? item.id : crypto.randomUUID(),
-					date: typeof item.date === 'string' ? item.date : '',
-					useCustomYear: Boolean(item.useCustomYear),
-					customYear: Number.isInteger(item.customYear)
-						? item.customYear
-						: (typeof item.customYear === 'number' ? Math.trunc(item.customYear) : null),
-					eraTag: ['none', 'christian', 'common-era'].includes(item.eraTag)
-						? item.eraTag
-						: 'none',
-					showDay: item.showDay !== false,
-					showMonth: item.showMonth !== false,
-					title: typeof item.title === 'string' ? item.title : '',
-					text: typeof item.text === 'string' ? item.text : '',
-					imageData: typeof item.imageData === 'string' ? item.imageData : null,
-					pinned: Boolean(item.pinned)
-				})).filter((item) => (item.date || (item.useCustomYear && Number.isInteger(item.customYear))) && item.title && item.text);
+				timelineData = normalizeImportedEvents(importedEvents);
 
 				await saveToLocal();
 				renderTimeline();
@@ -1114,9 +1510,12 @@
 
 		(async function init() {
 			applyTheme(loadTheme());
+			applyAppMode();
 			updateFullscreenState();
 			updateDateModeUI();
-			setTimelineTitle(loadTimelineTitle());
+			if (!SHARED_TIMELINE_PAYLOAD) {
+				setTimelineTitle(loadTimelineTitle());
+			}
 			await loadFromLocal();
 			renderTimeline();
 			updateTimelineLineWidth();
