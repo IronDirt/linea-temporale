@@ -427,6 +427,9 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 			</div>
 			<div id="timeline" class="timeline"></div>
 		</section>
+		<footer class="site-footer">
+			<p>&copy; <span id="copyrightYear"></span> <a href="https://timeline.salernohub.net" rel="noopener">timeline.salernohub.net</a></p>
+		</footer>
 	</div>
 
 	<div class="modal hidden" id="localResetModal" role="dialog" aria-modal="true" aria-labelledby="localResetTitle">
@@ -2033,6 +2036,7 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 			renderTimeline();
 			updateTimelineLineWidth();
 			showStatus('Pronto. I dati vengono salvati nel browser.');
+			document.getElementById('copyrightYear').textContent = new Date().getFullYear();
 		})();
 	</script>
 </body>
