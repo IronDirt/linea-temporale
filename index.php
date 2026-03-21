@@ -336,6 +336,9 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 	<link rel="stylesheet" href="style.css">
 	<link rel="stylesheet" href="style-mobile.css" media="(max-width: 900px)">
 	<link rel="stylesheet" href="style-desktop.css" media="(min-width: 901px)">
+	<!-- PWA: Manifest e theme-color -->
+	<link rel="manifest" href="manifest.json">
+	<meta name="theme-color" content="#222222">
 </head>
 <body>
 	<div class="lang-menu-wrap">
@@ -604,16 +607,29 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 		const APP_MODE = <?php echo json_encode($appMode, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>;
 		const SHARED_TIMELINE_PAYLOAD = <?php echo json_encode($sharedPayload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>;
 	</script>
-	<script src="lang/it.js"></script>
-	<script src="lang/en.js"></script>
-	<script src="app.js"></script>
-	<script src="lang/es.js"></script>
-	<script src="lang/de.js"></script>
-	<script src="lang/fr.js"></script>
-	<script src="lang/pt.js"></script>
-	<script src="lang/ru.js"></script>
-	<script src="lang/tr.js"></script>
-	<script src="lang/ja.js"></script>
-	<script src="lang/zh.js"></script>
+		<script src="lang/it.js"></script>
+		<script src="lang/en.js"></script>
+		<script src="app.js"></script>
+		<script src="lang/es.js"></script>
+		<script src="lang/de.js"></script>
+		<script src="lang/fr.js"></script>
+		<script src="lang/pt.js"></script>
+		<script src="lang/ru.js"></script>
+		<script src="lang/tr.js"></script>
+		<script src="lang/ja.js"></script>
+		<script src="lang/zh.js"></script>
+		<!-- PWA: Registrazione service worker -->
+		<script>
+			if ('serviceWorker' in navigator) {
+				window.addEventListener('load', function() {
+					navigator.serviceWorker.register('service-worker.js')
+						.then(function(registration) {
+							// Registrazione riuscita
+						}, function(err) {
+							// Registrazione fallita
+						});
+				});
+			}
+		</script>
 </body>
 </html>
