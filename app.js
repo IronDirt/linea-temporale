@@ -1433,7 +1433,11 @@ function downloadTimelineData() {
 
   const a = document.createElement("a");
   a.href = url;
-  a.download = "timeline-data.json";
+  // Ottieni il titolo direttamente dall'elemento con id="timelineTitle"
+  let title = (document.getElementById("timelineTitle")?.textContent || "Timeline").trim();
+  // Rimuovi caratteri non validi per i nomi file
+  title = title.replace(/[^a-zA-Z0-9-_ ]/g, "_");
+  a.download = `Backup_${title}.json`;
   document.body.appendChild(a);
   a.click();
   a.remove();
