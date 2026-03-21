@@ -1,11 +1,13 @@
 {
-  "name": "Linea Temporale",
-  "short_name": "LineaTemporale",
+  "name": "Timeline",
+  "id": "timeline",
+  "short_name": "Timeline",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#222222",
-  "description": "Visualizza e condividi linee temporali interattive.",
+  "description": "View and share interactive timelines.",
+  "orientation": "any",
   "icons": [
     {
       "src": "icon-192.png",
@@ -26,6 +28,23 @@
       "src": "icon-512.svg",
       "sizes": "512x512",
       "type": "image/svg+xml"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshot/Screenshot1.png",
+      "type": "image/png",
+      "sizes": "auto"
+    },
+    {
+      "src": "screenshot/Screenshot2.png",
+      "type": "image/png",
+      "sizes": "auto"
+    },
+    {
+      "src": "screenshot/Screenshot3.png",
+      "type": "image/png",
+      "sizes": "auto"
     }
   ]
 }
