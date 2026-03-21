@@ -1,5 +1,9 @@
 {
-  "appId": "com.example.app",
-  "appName": "App",
-  "webDir": "www"
+  "appId": "net.salernohub.timeline",
+  "appName": "Timeline",
+  "webDir": "www",
+  "server": {
+    "url": "https://timeline.salernohub.net/",
+    "cleartext": false
+  }
 }
