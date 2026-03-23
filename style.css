@@ -190,8 +190,8 @@ textarea {
 button,
 .button-like {
   border: none;
-  border-radius: 8px;
-  padding: 10px 12px;
+  border-radius: 12px;
+  padding: 10px 16px;
   font-size: 0.92rem;
   font-weight: 600;
   cursor: pointer;
@@ -199,7 +199,24 @@ button,
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
   -webkit-tap-highlight-color: transparent;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+button:hover,
+.button-like:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  filter: brightness(1.05);
+}
+
+button:active,
+.button-like:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  filter: brightness(0.95);
 }
 
 button:focus:not(:focus-visible),
@@ -209,7 +226,7 @@ button:focus:not(:focus-visible),
 }
 
 .primary {
-  background: #b4a693;
+  background: #7a6750;
   color: #fff;
 }
 
@@ -226,6 +243,26 @@ button:focus:not(:focus-visible),
 .muted {
   background: #cec6ba;
   color: #2f2c26;
+}
+
+.icon-only {
+  padding: 0;
+  aspect-ratio: 1/1;
+}
+
+svg.icon {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.2s ease;
+}
+
+button:hover svg.icon {
+  transform: scale(1.1);
 }
 
 .timeline {
@@ -303,11 +340,11 @@ button:focus:not(:focus-visible),
 }
 
 .viewer-action-icon {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   fill: none;
   stroke: currentColor;
-  stroke-width: 2.2;
+  stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
@@ -478,11 +515,10 @@ button:focus:not(:focus-visible),
 }
 
 .timeline-zoom-btn {
-  width: 34px;
-  height: 34px;
+  width: 38px;
+  height: 38px;
   padding: 0;
-  font-size: 1.1rem;
-  line-height: 1;
+  border-radius: 50%;
 }
 
 .timeline-zoom-btn:disabled {
@@ -578,51 +614,49 @@ button:focus:not(:focus-visible),
 .timeline-pin-btn {
   position: absolute;
   left: calc(
-    var(--timeline-dot-left, 20px) + (var(--timeline-dot-size, 10px) / 2) + 6px
+    var(--timeline-dot-left, 12px) + (var(--timeline-dot-size, 10px) / 2) + 6px
   );
   top: calc(-28px + (var(--timeline-dot-size, 10px) / 2) - 6px);
   border: none;
   background: transparent;
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   padding: 0;
-  border-radius: 6px;
+  border-radius: 8px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   transform: translate(-50%, -100%);
   z-index: 2;
   cursor: pointer;
+  transition: all 0.2s ease;
+  color: #7a6750;
+  opacity: 0.6;
 }
 
-.timeline-pin-icon {
+.timeline-pin-btn svg.icon {
   width: 18px;
   height: 18px;
-  display: block;
-  opacity: 0.62;
-  object-fit: contain;
-  transition:
-    opacity 160ms ease,
-    transform 160ms ease;
 }
 
 .timeline-pin-btn:hover {
-  background: #d7cec1;
-}
-
-.timeline-pin-btn:hover .timeline-pin-icon {
-  opacity: 0.88;
+  background: rgba(122, 103, 80, 0.1);
+  opacity: 1;
 }
 
 .timeline-pin-btn.is-pinned {
-  background: #d7cec1;
-  box-shadow: inset 0 0 0 1px #b7ab9a;
+  opacity: 1;
+  color: #7a6750;
+  background: rgba(122, 103, 80, 0.15);
+  box-shadow: inset 0 0 0 1px rgba(122, 103, 80, 0.2);
 }
 
-.timeline-pin-btn.is-pinned .timeline-pin-icon {
-  opacity: 1;
+.timeline-pin-btn.is-pinned svg.icon {
+  fill: #7a6750;
   transform: translateY(-1px);
 }
+
+/* timeline-pin-icon removed, uses .icon class now */
 
 .timeline-item.timeline-item-collapsed .timeline-pin-btn {
   opacity: 0;
@@ -679,20 +713,24 @@ button:focus:not(:focus-visible),
 }
 
 .fab-add {
-  width: 58px;
-  height: 58px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
   padding: 0;
-  font-size: 2rem;
-  line-height: 1;
   background: #7a6750;
   color: #f2ece2;
-  box-shadow: none;
+  box-shadow: 0 4px 12px rgba(122, 103, 80, 0.3);
   margin-right: 4px;
 }
 
+.fab-add svg {
+  width: 32px;
+  height: 32px;
+}
+
 .fab-add:hover {
-  filter: brightness(1.05);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 16px rgba(122, 103, 80, 0.4);
 }
 
 .fab-stack {
@@ -720,11 +758,11 @@ button:focus:not(:focus-visible),
 }
 
 .backup-icon {
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   fill: none;
   stroke: currentColor;
-  stroke-width: 2.4;
+  stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
@@ -760,17 +798,17 @@ button:focus:not(:focus-visible),
   height: 24px;
   fill: none;
   stroke: currentColor;
-  stroke-width: 2.2;
+  stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
 .theme-icon {
-  width: 26px;
-  height: 26px;
+  width: 24px;
+  height: 24px;
   fill: none;
   stroke: currentColor;
-  stroke-width: 2.1;
+  stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
 }

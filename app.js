@@ -1,5 +1,20 @@
 const LANG_KEY = "timeline_lang_v1";
 
+const ICONS = {
+  plus: '<svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
+  minus: '<svg class="icon" viewBox="0 0 24 24"><path d="M5 12h14"/></svg>',
+  edit: '<svg class="icon" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7m-9.5-3.5 a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 9.5-9.5z"></path></svg>',
+  trash: '<svg class="icon" viewBox="0 0 24 24"><path d="M3 6h18m-2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m-6 5v6m4-6v6"></path></svg>',
+  pin: '<svg class="icon pin-icon" viewBox="0 0 24 24"><path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v2a2 2 0 0 0 1.27 1.87L12 22l7.73-8.13A2 2 0 0 0 21 10z"></path><circle cx="12" cy="10" r="3"></circle></svg>',
+  pinSimple: '<svg class="icon" viewBox="0 0 24 24"><path d="M12 17v5M9 10.76a2 2 0 0 1-1.6-1.93 2 2 0 0 1 1.4-1.9L12 3l3.2 3.93a2 2 0 0 1 1.4 1.9 2 2 0 0 1-1.6 1.93l-3 4.24z"></path></svg>',
+  check: '<svg class="icon" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"></path></svg>',
+  x: '<svg class="icon" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg>'
+};
+
+function getIcon(name) {
+  return ICONS[name] || '';
+}
+
 function detectLang() {
   const langMap = {
     it: "it",
@@ -89,14 +104,11 @@ function applyTranslations() {
   set("viewerLinkInput", "placeholder", "viewerLinkPlaceholder");
   set("copyViewerLinkBtn", "aria", "copyViewerLinkLabel");
   set("copyViewerLinkBtn", "title", "copyViewerLinkLabel");
-  set("downloadBtn", "text", "downloadBtnText");
-  set("uploadBtn", "text", "importBtnText");
-  set("saveOnlineBtn", "text", "saveBtnText");
+  // Buttons with icons and child spans are now handled by [data-i18n] in index.php
   set("resetTimelineBtn", "aria", "resetTimelineLabel");
   set("resetTimelineBtn", "title", "resetTimelineTitle");
   set("editTimelineTitleBtn", "aria", "editTitleLabel");
   set("editTimelineTitleBtn", "title", "editTitleTitle");
-  set("viewerCreateBtn", "text", "viewerCreateBtnText");
   set("viewerDownloadBtn", "aria", "viewerDownloadLabel");
   set("viewerDownloadBtn", "title", "viewerDownloadLabel");
   set("viewerActions", "aria", "viewerActionsLabel");
@@ -106,10 +118,7 @@ function applyTranslations() {
   set("zoomInBtn", "title", "zoomInTitle");
   set("localResetTitle", "text", "localResetTitleText");
   set("closeLocalResetBtn", "aria", "closeLabel");
-  set("localResetDownloadBtn", "text", "localResetDownloadText");
-  set("localResetSaveOnlineBtn", "text", "localResetSaveOnlineText");
-  set("localResetConfirmBtn", "text", "localResetConfirmText");
-  set("localResetDeleteOnlineBtn", "text", "localResetDeleteOnlineText");
+  // localReset buttons are now handled by [data-i18n] in index.php
   set(
     "localResetAdminLinkInput",
     "placeholder",
@@ -118,16 +127,10 @@ function applyTranslations() {
   set("localResetCopyAdminLinkBtn", "aria", "copyAdminLinkLabel");
   set("localResetCopyAdminLinkBtn", "title", "copyAdminLinkLabel");
   set("mobileViewerMenuWrap", "aria", "mobileViewerActionsLabel");
-  set("mobileViewerCreateBtn", "text", "viewerCreateBtnText");
-  set("mobileViewerZoomInBtn", "aria", "zoomInLabel");
-  set("mobileViewerZoomInBtn", "title", "zoomInTitle");
-  set("mobileViewerZoomOutBtn", "aria", "zoomOutLabel");
-  set("mobileViewerZoomOutBtn", "title", "zoomOutTitle");
   set("mobileViewerDownloadBtn", "aria", "viewerDownloadLabel");
   set("mobileViewerDownloadBtn", "title", "viewerDownloadLabel");
   set("closeModalBtn", "aria", "closeLabel");
-  set("eventImageTrigger", "text", "chooseImageText");
-  set("removeEventImageBtn", "text", "removeImageText");
+  // eventImageTrigger and removeEventImageBtn are now handled by [data-i18n] in index.php
   set("eventImageName", "text", "noFileSelected");
   set("eventCustomYear", "placeholder", "customYearPlaceholder");
   set("eventTitle", "placeholder", "titlePlaceholder");
@@ -136,7 +139,10 @@ function applyTranslations() {
 
   const isEditing =
     Number.parseInt(document.getElementById("editIndex")?.value, 10) >= 0;
-  set("saveEventBtn", "text", isEditing ? "updateEventText" : "addEventText");
+  const saveBtnTextEl = document.getElementById("saveEventBtnText");
+  if (saveBtnTextEl) {
+    saveBtnTextEl.textContent = t(isEditing ? "updateEventText" : "addEventText");
+  }
   set(
     "modalTitle",
     "text",
@@ -836,15 +842,21 @@ function renderTimeline() {
         });
 
     item.innerHTML = `
-				<button type="button" class="timeline-pin-btn${isPinned ? " is-pinned" : ""}" data-action="pin" data-index="${originalIndex}" aria-label="${isPinned ? t("pinRemoveLabel") : t("pinAddLabel")}" title="${isPinned ? t("pinRemoveTitle") : t("pinAddTitle")}"><img class="timeline-pin-icon" src="pin-icon.png" alt="" loading="lazy" decoding="async"></button>
+				<button type="button" class="timeline-pin-btn${isPinned ? " is-pinned" : ""}" data-action="pin" data-index="${originalIndex}" aria-label="${isPinned ? t("pinRemoveLabel") : t("pinAddLabel")}" title="${isPinned ? t("pinRemoveTitle") : t("pinAddTitle")}">
+          ${getIcon("pinSimple")}
+        </button>
 				<div class="timeline-item-content">
 					<div class="timeline-date">${formattedDate}</div>
 					${imageBlock}
 					<h3 class="timeline-title">${escapeHtml(eventItem.title)}</h3>
 					<p class="timeline-text">${escapeHtml(eventItem.text)}</p>
 					<div class="item-actions">
-						<button type="button" class="secondary" data-action="edit" data-index="${originalIndex}">${t("editEventText")}</button>
-						<button type="button" class="danger" data-action="delete" data-index="${originalIndex}">${t("deleteEventText")}</button>
+						<button type="button" class="secondary" data-action="edit" data-index="${originalIndex}">
+              ${getIcon("edit")} <span>${t("editEventText")}</span>
+            </button>
+						<button type="button" class="danger" data-action="delete" data-index="${originalIndex}">
+              ${getIcon("trash")} <span>${t("deleteEventText")}</span>
+            </button>
 					</div>
 				</div>
 			`;

@@ -251,7 +251,7 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 	<meta name="twitter:description" content="Crea la tua linea del tempo personalizzata in modo semplice e veloce.">
 	<meta name="twitter:image" content="https://timeline.salernohub.net/og-image.svg">
 	<meta name="application-name" content="Timeline SalernoHub">
-	<meta name="theme-color" content="#2563eb">
+	<meta name="theme-color" content="#7a6750">
 	<meta name="referrer" content="strict-origin-when-cross-origin">
 		<!-- Google tag (gtag.js) -->
 		<script async src="https://www.googletagmanager.com/gtag/js?id=G-R2QSCDWV2Q"></script>
@@ -338,7 +338,7 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 	<link rel="stylesheet" href="style-desktop.css" media="(min-width: 901px)">
 	<!-- PWA: Manifest e theme-color -->
 	<link rel="manifest" href="manifest.json">
-	<meta name="theme-color" content="#222222">
+	<meta name="theme-color" content="#2f2c26">
 </head>
 <body>
 	<div class="lang-menu-wrap">
@@ -360,13 +360,13 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 		<div class="top-content">
 			<h1 data-i18n="appTitle">Linea Temporale</h1>
 			<div class="fab-stack top-actions">
-				<button type="button" class="fab-add" id="openFormBtn" aria-label="Aggiungi nuovo evento">+</button>
+				<button type="button" class="fab-add" id="openFormBtn" aria-label="Aggiungi nuovo evento">
+					<svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+				</button>
 				<div class="backup-wrap">
 					<button type="button" class="fab-backup" id="backupMenuBtn" aria-label="Backup" title="Backup">
 						<svg class="backup-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-							<path d="M12 3v10"></path>
-							<path d="M8 10l4 4 4-4"></path>
-							<path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"></path>
+							<path d="M12 13v8M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242M8 17l4 4 4-4"></path>
 						</svg>
 					</button>
 					<div class="backup-menu hidden" id="backupMenu" role="menu" aria-label="Menu backup">
@@ -376,9 +376,9 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 								<div class="online-save-input-row">
 									<input id="adminLinkInput" type="text" readonly placeholder="Link admin (vuoto finché non salvi)">
 									<button type="button" class="secondary copy-link-btn" id="copyAdminLinkBtn" aria-label="Copia link admin" title="Copia link admin">
-										<svg class="copy-link-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-											<rect x="9" y="9" width="11" height="11" rx="2"></rect>
-											<rect x="4" y="4" width="11" height="11" rx="2"></rect>
+										<svg class="icon" viewBox="0 0 24 24">
+											<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+											<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
 										</svg>
 									</button>
 								</div>
@@ -388,44 +388,50 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 								<div class="online-save-input-row">
 									<input id="viewerLinkInput" type="text" readonly placeholder="Link pubblico (vuoto finché non salvi)">
 									<button type="button" class="secondary copy-link-btn" id="copyViewerLinkBtn" aria-label="Copia link visualizzatore" title="Copia link visualizzatore">
-										<svg class="copy-link-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-											<rect x="9" y="9" width="11" height="11" rx="2"></rect>
-											<rect x="4" y="4" width="11" height="11" rx="2"></rect>
+										<svg class="icon" viewBox="0 0 24 24">
+											<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+											<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
 										</svg>
 									</button>
 								</div>
 							</div>
 							<div class="backup-actions-row">
-								<button type="button" class="secondary" id="downloadBtn" role="menuitem">Scarica</button>
-								<button type="button" class="secondary" id="uploadBtn" role="menuitem">Importa</button>
-								<button type="button" class="primary" id="saveOnlineBtn" role="menuitem">Salva</button>
+								<button type="button" class="secondary" id="downloadBtn" role="menuitem">
+									<svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4m4-5l5 5 5-5m-5 5V3"></path></svg>
+									<span data-i18n="downloadBtnText">Scarica</span>
+								</button>
+								<button type="button" class="secondary" id="uploadBtn" role="menuitem">
+									<svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5m5-5v12"></path></svg>
+									<span data-i18n="importBtnText">Importa</span>
+								</button>
+								<button type="button" class="primary" id="saveOnlineBtn" role="menuitem">
+									<svg class="icon" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+									<span data-i18n="saveBtnText">Salva</span>
+								</button>
 							</div>
 						</div>
 					</div>
 				</div>
 				<button type="button" class="fab-fullscreen" id="fullscreenBtn" aria-label="Attiva schermo intero" title="Attiva schermo intero">
-					<svg class="fullscreen-icon" id="fullscreenEnterIcon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-						<path d="M8 3H3v5M16 3h5v5M21 16v5h-5M3 16v5h5"></path>
+					<svg class="fullscreen-icon" id="fullscreenEnterIcon" viewBox="0 0 24 24">
+						<path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
 					</svg>
-					<svg class="fullscreen-icon hidden" id="fullscreenExitIcon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-						<path d="M9 3H3v6M15 3h6v6M21 15v6h-6M3 15v6h6"></path>
+					<svg class="fullscreen-icon hidden" id="fullscreenExitIcon" viewBox="0 0 24 24">
+						<path d="M4 14h6m0 0v6m0-6L3 21m17-7h-6m0 0v6m0-6l7 7M4 10h6m0 0V4m0 6L3 3m17 7h-6m0 0V4m0 6l7-7"></path>
 					</svg>
 				</button>
 				<button type="button" class="fab-theme" id="themeToggleBtn" aria-label="Tema scuro" title="Tema scuro">
-					<svg class="theme-icon theme-icon-moon" id="themeMoonIcon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-						<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 1 0 9.8 9.8z"></path>
+					<svg class="theme-icon theme-icon-moon" id="themeMoonIcon" viewBox="0 0 24 24">
+						<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
 					</svg>
-					<svg class="theme-icon theme-icon-sun hidden" id="themeSunIcon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-						<circle cx="12" cy="12" r="4"></circle>
-						<path d="M12 2v2.5M12 19.5V22M4.93 4.93l1.77 1.77M17.3 17.3l1.77 1.77M2 12h2.5M19.5 12H22M4.93 19.07l1.77-1.77M17.3 6.7l1.77-1.77"></path>
+					<svg class="theme-icon theme-icon-sun hidden" id="themeSunIcon" viewBox="0 0 24 24">
+						<circle cx="12" cy="12" r="5"></circle>
+						<path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M17.66 6.34l1.42-1.42"></path>
 					</svg>
 				</button>
 				<button type="button" class="muted timeline-reset-btn fab-reset hidden" id="resetTimelineBtn" aria-label="Crea nuova linea temporale locale" title="Nuova linea temporale (solo locale)">
-					<svg class="timeline-reset-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-						<path d="M3 6h18"></path>
-						<path d="M8 6V4h8v2"></path>
-						<path d="M6 6l1 14h10l1-14"></path>
-						<path d="M10 10v7M14 10v7"></path>
+					<svg class="timeline-reset-icon" viewBox="0 0 24 24">
+						<path d="M3 6h18m-2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m-6 5v6m4-6v6"></path>
 					</svg>
 				</button>
 				<input id="uploadInput" class="hidden" type="file" accept="application/json">
@@ -435,31 +441,38 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 		<section class="card timeline-section">
 			<div class="timeline-topbar">
 				<div class="timeline-header">
-					<button type="button" class="muted timeline-title-edit" id="editTimelineTitleBtn" aria-label="Modifica titolo timeline" title="Modifica titolo">✎</button>
+					<button type="button" class="muted timeline-title-edit" id="editTimelineTitleBtn" aria-label="Modifica titolo timeline" title="Modifica titolo">
+						<svg class="icon" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7m-9.5-3.5 a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 9.5-9.5z"></path></svg>
+					</button>
 					<h2 id="timelineTitle">Timeline</h2>
 				</div>
 				<div class="timeline-right-controls">
 					<div class="viewer-actions hidden" id="viewerActions" aria-label="Azioni visualizzatore">
-						<button type="button" class="primary viewer-action-btn" id="viewerCreateBtn">Crea la tua linea temporale</button>
+						<button type="button" class="primary viewer-action-btn" id="viewerCreateBtn">
+							<svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+							<span data-i18n="viewerCreateBtnText">Crea la tua linea temporale</span>
+						</button>
 						<button type="button" class="secondary viewer-action-btn viewer-icon-btn" id="viewerDownloadBtn" aria-label="Scarica timeline" title="Scarica timeline">
-							<svg class="viewer-action-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-								<path d="M12 3v10"></path>
-								<path d="M8 10l4 4 4-4"></path>
-								<path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"></path>
+							<svg class="viewer-action-icon" viewBox="0 0 24 24">
+								<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4m4-5l5 5 5-5m-5 5V3"></path>
 							</svg>
 						</button>
 						<button type="button" class="secondary viewer-action-btn viewer-icon-btn" id="viewerFullscreenBtn" aria-label="Attiva schermo intero" title="Attiva schermo intero">
-							<svg class="viewer-action-icon" id="viewerFullscreenEnterIcon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-								<path d="M8 3H3v5M16 3h5v5M21 16v5h-5M3 16v5h5"></path>
+							<svg class="viewer-action-icon" id="viewerFullscreenEnterIcon" viewBox="0 0 24 24">
+								<path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
 							</svg>
-							<svg class="viewer-action-icon hidden" id="viewerFullscreenExitIcon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-								<path d="M9 3H3v6M15 3h6v6M21 15v6h-6M3 15v6h6"></path>
+							<svg class="viewer-action-icon hidden" id="viewerFullscreenExitIcon" viewBox="0 0 24 24">
+								<path d="M4 14h6m0 0v6m0-6L3 21m17-7h-6m0 0v6m0-6l7 7M4 10h6m0 0V4m0 6L3 3m17 7h-6m0 0V4m0 6l7-7"></path>
 							</svg>
 						</button>
 					</div>
 						<div class="timeline-zoom-controls" data-i18n-aria-label="zoomControlsLabel" aria-label="Controlli zoom timeline">
-						<button type="button" class="muted timeline-zoom-btn" id="zoomOutBtn" aria-label="Riduci dettagli timeline" title="Riduci dettagli">−</button>
-						<button type="button" class="muted timeline-zoom-btn" id="zoomInBtn" aria-label="Aumenta dettagli timeline" title="Aumenta dettagli">+</button>
+						<button type="button" class="muted timeline-zoom-btn" id="zoomOutBtn" aria-label="Riduci dettagli timeline" title="Riduci dettagli">
+							<svg class="icon" viewBox="0 0 24 24"><path d="M5 12h14"></path></svg>
+						</button>
+						<button type="button" class="muted timeline-zoom-btn" id="zoomInBtn" aria-label="Aumenta dettagli timeline" title="Aumenta dettagli">
+							<svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></svg>
+						</button>
 					</div>
 				</div>
 			</div>
@@ -475,24 +488,38 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 		<section class="modal-card local-reset-card">
 			<div class="modal-header">
 					<h2 id="localResetTitle">Nuova linea temporale</h2>
-				<button type="button" class="muted close-btn" id="closeLocalResetBtn" aria-label="Chiudi">✕</button>
+				<button type="button" class="muted close-btn" id="closeLocalResetBtn" aria-label="Chiudi">
+					<svg class="icon" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+				</button>
 			</div>
 			<p class="local-reset-text" data-i18n="localResetText1">Questa azione cancellerà la timeline solo in locale (dispositivo/browser attuale).</p>
 			<p class="local-reset-text" data-i18n="localResetText2">La versione online non verrà eliminata.</p>
 			<p class="local-reset-text" data-i18n="localResetText3">Prima di procedere, si consiglia di scaricare la linea temporale o salvarla online.</p>
 			<div class="local-reset-actions">
-				<button type="button" class="secondary" id="localResetDownloadBtn">Scarica</button>
-				<button type="button" class="secondary" id="localResetSaveOnlineBtn">Salva online</button>
-				<button type="button" class="danger" id="localResetConfirmBtn">Cancella solo locale</button>
-				<button type="button" class="danger" id="localResetDeleteOnlineBtn">Cancella online</button>
+				<button type="button" class="secondary" id="localResetDownloadBtn">
+					<svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4m4-5l5 5 5-5m-5 5V3"></path></svg>
+					<span data-i18n="localResetDownloadText">Scarica</span>
+				</button>
+				<button type="button" class="secondary" id="localResetSaveOnlineBtn">
+					<svg class="icon" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+					<span data-i18n="localResetSaveOnlineText">Salva online</span>
+				</button>
+				<button type="button" class="danger" id="localResetConfirmBtn">
+					<svg class="icon" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0 1 16.138 21H7.862a2 2 0 0 1-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v3M4 7h16"></path></svg>
+					<span data-i18n="localResetConfirmText">Cancella solo locale</span>
+				</button>
+				<button type="button" class="danger" id="localResetDeleteOnlineBtn">
+					<svg class="icon" viewBox="0 0 24 24"><path d="M3 6h18m-2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m-6 5v6m4-6v6"></path></svg>
+					<span data-i18n="localResetDeleteOnlineText">Cancella online</span>
+				</button>
 			</div>
 			<div class="local-reset-online-panel online-save-field hidden" id="localResetAdminLinkWrap">
 				<label data-i18n="localResetAdminLinkLabel" for="localResetAdminLinkInput">Link admin</label>
 				<div class="online-save-input-row">
 					<input type="text" id="localResetAdminLinkInput" readonly placeholder="Salva online per ottenere il link admin">
 					<button type="button" class="muted copy-link-btn" id="localResetCopyAdminLinkBtn" aria-label="Copia link admin" title="Copia link admin">
-						<svg class="copy-link-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-							<rect x="9" y="9" width="13" height="13" rx="2"></rect>
+						<svg class="icon" viewBox="0 0 24 24">
+							<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
 							<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
 						</svg>
 					</button>
@@ -502,41 +529,46 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 	</div>
 
 	<div class="mobile-viewer-menu-wrap hidden" id="mobileViewerMenuWrap" aria-label="Azioni visualizzatore mobile">
-		<button type="button" class="primary mobile-viewer-action-btn mobile-viewer-create-btn hidden" id="mobileViewerCreateBtn">Crea la tua linea temporale</button>
+		<button type="button" class="primary mobile-viewer-action-btn mobile-viewer-create-btn hidden" id="mobileViewerCreateBtn">
+			<svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+			<span data-i18n="viewerCreateBtnText">Crea la tua linea temporale</span>
+		</button>
 		<div class="mobile-viewer-menu hidden" id="mobileViewerMenu">
-			<button type="button" class="muted mobile-viewer-icon-btn" id="mobileViewerZoomInBtn" aria-label="Aumenta dettagli timeline" title="Aumenta dettagli">+</button>
-			<button type="button" class="muted mobile-viewer-icon-btn" id="mobileViewerZoomOutBtn" aria-label="Riduci dettagli timeline" title="Riduci dettagli">−</button>
+			<button type="button" class="muted mobile-viewer-icon-btn" id="mobileViewerZoomInBtn" aria-label="Aumenta dettagli timeline" title="Aumenta dettagli">
+				<svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></svg>
+			</button>
+			<button type="button" class="muted mobile-viewer-icon-btn" id="mobileViewerZoomOutBtn" aria-label="Riduci dettagli timeline" title="Riduci dettagli">
+				<svg class="icon" viewBox="0 0 24 24"><path d="M5 12h14"></path></svg>
+			</button>
 			<button type="button" class="secondary mobile-viewer-icon-btn" id="mobileViewerThemeBtn" aria-label="Tema scuro" title="Tema scuro">
-				<svg class="viewer-action-icon" id="mobileViewerThemeMoonIcon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-					<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 1 0 9.8 9.8z"></path>
+				<svg class="viewer-action-icon" id="mobileViewerThemeMoonIcon" viewBox="0 0 24 24">
+					<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
 				</svg>
-				<svg class="viewer-action-icon hidden" id="mobileViewerThemeSunIcon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-					<circle cx="12" cy="12" r="4"></circle>
-					<path d="M12 2v2.5M12 19.5V22M4.93 4.93l1.77 1.77M17.3 17.3l1.77 1.77M2 12h2.5M19.5 12H22M4.93 19.07l1.77-1.77M17.3 6.7l1.77-1.77"></path>
+				<svg class="viewer-action-icon hidden" id="mobileViewerThemeSunIcon" viewBox="0 0 24 24">
+					<circle cx="12" cy="12" r="5"></circle>
+					<path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M17.66 6.34l1.42-1.42"></path>
 				</svg>
 			</button>
 			<button type="button" class="secondary mobile-viewer-icon-btn" id="mobileViewerFullscreenBtn" aria-label="Attiva schermo intero" title="Attiva schermo intero">
-				<svg class="viewer-action-icon" id="mobileViewerFullscreenEnterIcon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-					<path d="M8 3H3v5M16 3h5v5M21 16v5h-5M3 16v5h5"></path>
+				<svg class="viewer-action-icon" id="mobileViewerFullscreenEnterIcon" viewBox="0 0 24 24">
+					<path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
 				</svg>
-				<svg class="viewer-action-icon hidden" id="mobileViewerFullscreenExitIcon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-					<path d="M9 3H3v6M15 3h6v6M21 15v6h-6M3 15v6h6"></path>
+				<svg class="viewer-action-icon hidden" id="mobileViewerFullscreenExitIcon" viewBox="0 0 24 24">
+					<path d="M4 14h6m0 0v6m0-6L3 21m17-7h-6m0 0v6m0-6l7 7M4 10h6m0 0V4m0 6L3 3m17 7h-6m0 0V4m0 6l7-7"></path>
 				</svg>
 			</button>
 			<button type="button" class="secondary mobile-viewer-icon-btn" id="mobileViewerDownloadBtn" aria-label="Scarica timeline" title="Scarica timeline">
-				<svg class="viewer-action-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-					<path d="M12 3v10"></path>
-					<path d="M8 10l4 4 4-4"></path>
-					<path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"></path>
+				<svg class="viewer-action-icon" viewBox="0 0 24 24">
+					<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4m4-5l5 5 5-5m-5 5V3"></path>
 				</svg>
 			</button>
 		</div>
 		<button type="button" class="mobile-viewer-menu-btn" id="mobileViewerMenuBtn" aria-label="Apri azioni visualizzatore" title="Azioni visualizzatore">
-			<svg class="backup-icon" id="mobileViewerMenuOpenIcon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-				<path d="M4 7h16M4 12h16M4 17h16"></path>
+			<svg class="backup-icon" id="mobileViewerMenuOpenIcon" viewBox="0 0 24 24">
+				<path d="M3 12h18M3 6h18M3 18h18"></path>
 			</svg>
-			<svg class="backup-icon hidden" id="mobileViewerMenuCloseIcon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-				<path d="M6 6l12 12M18 6L6 18"></path>
+			<svg class="backup-icon hidden" id="mobileViewerMenuCloseIcon" viewBox="0 0 24 24">
+				<path d="M18 6L6 18M6 6l12 12"></path>
 			</svg>
 		</button>
 	</div>
@@ -546,7 +578,9 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 		<section class="modal-card">
 			<div class="modal-header">
 				<h2 id="modalTitle">Nuovo evento</h2>
-				<button type="button" class="muted close-btn" id="closeModalBtn" aria-label="Chiudi">✕</button>
+				<button type="button" class="muted close-btn" id="closeModalBtn" aria-label="Chiudi">
+					<svg class="icon" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+				</button>
 			</div>
 
 			<form id="eventForm">
@@ -587,8 +621,14 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 
 				<label data-i18n="imageLabel" for="eventImage">Immagine (opzionale)</label>
 				<div class="image-picker-row">
-					<label id="eventImageTrigger" for="eventImage" class="button-like secondary image-picker-btn">Scegli immagine</label>
-					<button type="button" id="removeEventImageBtn" class="muted image-remove-btn hidden">Rimuovi immagine</button>
+					<label id="eventImageTrigger" for="eventImage" class="button-like secondary image-picker-btn">
+						<svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4m4-5l5 5 5-5m-5 5V3"></path></svg>
+						<span data-i18n="chooseImageText">Scegli immagine</span>
+					</label>
+					<button type="button" id="removeEventImageBtn" class="muted image-remove-btn hidden">
+						<svg class="icon" viewBox="0 0 24 24"><path d="M3 6h18m-2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+						<span data-i18n="removeImageText">Rimuovi immagine</span>
+					</button>
 					<span id="eventImageName" class="image-picker-name">Nessun file selezionato</span>
 				</div>
 				<input id="eventImage" class="hidden" type="file" accept="image/*">
@@ -597,7 +637,10 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 				</div>
 
 				<div class="form-actions">
-					<button type="submit" class="primary" id="saveEventBtn">Aggiungi evento</button>
+					<button type="submit" class="primary" id="saveEventBtn">
+						<svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></svg>
+						<span id="saveEventBtnText" data-i18n="addEventText">Aggiungi evento</span>
+					</button>
 				</div>
 			</form>
 		</section>
