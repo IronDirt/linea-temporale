@@ -215,7 +215,7 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 <html lang="it">
 <head>
 	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 	<title>Timeline SalernoHub | Crea Linee Temporali Personalizzate Online</title>
 	<meta name="description" content="Crea una linea temporale personalizzata online per scuola, religione, lavoro, studio, storia, progetti ed eventi personali. Timeline semplice, veloce e gratuita.">
 	<meta name="keywords" content="linea temporale, timeline online, creare timeline, timeline scuola, timeline religione, timeline lavoro, linea del tempo personalizzata, timeline storia, timeline progetti, timeline eventi">
@@ -251,7 +251,23 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 	<meta name="twitter:description" content="Crea la tua linea del tempo personalizzata in modo semplice e veloce.">
 	<meta name="twitter:image" content="https://timeline.salernohub.net/og-image.svg">
 	<meta name="application-name" content="Timeline SalernoHub">
-	<meta name="theme-color" content="#7a6750">
+	<meta name="theme-color" content="#e9e5de" id="meta-theme-color">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+	<script>
+		(function() {
+			const savedTheme = localStorage.getItem('timeline_theme_v1');
+			const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+			const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+			const color = (theme === 'dark') ? '#0b1220' : '#e9e5de';
+			document.documentElement.classList.toggle('theme-dark', theme === 'dark');
+			document.addEventListener('DOMContentLoaded', () => {
+				document.body.classList.toggle('theme-dark', theme === 'dark');
+				const meta = document.getElementById('meta-theme-color');
+				if (meta) meta.setAttribute('content', color);
+			});
+		})();
+	</script>
 	<meta name="referrer" content="strict-origin-when-cross-origin">
 		<!-- Google tag (gtag.js) -->
 		<script async src="https://www.googletagmanager.com/gtag/js?id=G-R2QSCDWV2Q"></script>
@@ -336,9 +352,8 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 	<link rel="stylesheet" href="style.css">
 	<link rel="stylesheet" href="style-mobile.css" media="(max-width: 900px)">
 	<link rel="stylesheet" href="style-desktop.css" media="(min-width: 901px)">
-	<!-- PWA: Manifest e theme-color -->
+	<!-- PWA: Manifest -->
 	<link rel="manifest" href="manifest.json">
-	<meta name="theme-color" content="#2f2c26">
 </head>
 <body>
 	<div class="lang-menu-wrap">
@@ -441,10 +456,10 @@ if ($timelineQueryId !== '' && preg_match('/^[a-f0-9]{12}$/', $timelineQueryId) 
 		<section class="card timeline-section">
 			<div class="timeline-topbar">
 				<div class="timeline-header">
-					<button type="button" class="muted timeline-title-edit" id="editTimelineTitleBtn" aria-label="Modifica titolo timeline" title="Modifica titolo">
-						<svg class="icon" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7m-9.5-3.5 a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 9.5-9.5z"></path></svg>
-					</button>
 					<h2 id="timelineTitle">Timeline</h2>
+					<button type="button" class="muted timeline-title-edit" id="editTimelineTitleBtn" aria-label="Modifica titolo timeline" title="Modifica titolo">
+						<svg class="icon" viewBox="0 0 24 24"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
+					</button>
 				</div>
 				<div class="timeline-right-controls">
 					<div class="viewer-actions hidden" id="viewerActions" aria-label="Azioni visualizzatore">

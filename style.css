@@ -501,11 +501,17 @@ button:hover svg.icon {
 }
 
 .timeline-title-edit {
-  width: 34px;
-  height: 34px;
+  width: 28px;
+  height: 28px;
   padding: 0;
   flex: 0 0 auto;
   margin-left: 0;
+  border-radius: 50%;
+}
+
+.timeline-title-edit svg.icon {
+  width: 14px;
+  height: 14px;
 }
 
 .timeline-zoom-controls {
@@ -634,9 +640,19 @@ button:hover svg.icon {
   opacity: 0.6;
 }
 
-.timeline-pin-btn svg.icon {
+.timeline-pin-btn .icon {
   width: 18px;
   height: 18px;
+}
+
+.pin-icon-file {
+  background-color: currentColor;
+  -webkit-mask: url("pin-icon.png") no-repeat center;
+  mask: url("pin-icon.png") no-repeat center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  display: inline-block;
+  transition: transform 0.2s ease;
 }
 
 .timeline-pin-btn:hover {
@@ -651,8 +667,9 @@ button:hover svg.icon {
   box-shadow: inset 0 0 0 1px rgba(122, 103, 80, 0.2);
 }
 
-.timeline-pin-btn.is-pinned svg.icon {
+.timeline-pin-btn.is-pinned .icon {
   fill: #7a6750;
+  background-color: #7a6750;
   transform: translateY(-1px);
 }
 

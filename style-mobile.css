@@ -4,7 +4,10 @@
   }
 
   .container {
-    padding: 0;
+    padding-top: env(safe-area-inset-top, 14px);
+    padding-bottom: env(safe-area-inset-bottom, 24px);
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
   }
 
   .timeline-section {
@@ -29,6 +32,18 @@
 
   .timeline-header {
     padding: 18px 10px 0;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .timeline-title-edit {
+    width: 34px;
+    height: 34px;
+  }
+
+  .timeline-title-edit svg.icon {
+    width: 18px;
+    height: 18px;
   }
 
   .timeline-topbar {

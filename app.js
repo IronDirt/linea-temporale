@@ -3,9 +3,9 @@ const LANG_KEY = "timeline_lang_v1";
 const ICONS = {
   plus: '<svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
   minus: '<svg class="icon" viewBox="0 0 24 24"><path d="M5 12h14"/></svg>',
-  edit: '<svg class="icon" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7m-9.5-3.5 a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 9.5-9.5z"></path></svg>',
+  edit: '<svg class="icon" viewBox="0 0 24 24"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>',
   trash: '<svg class="icon" viewBox="0 0 24 24"><path d="M3 6h18m-2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m-6 5v6m4-6v6"></path></svg>',
-  pin: '<svg class="icon pin-icon" viewBox="0 0 24 24"><path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v2a2 2 0 0 0 1.27 1.87L12 22l7.73-8.13A2 2 0 0 0 21 10z"></path><circle cx="12" cy="10" r="3"></circle></svg>',
+  pin: '<span class="icon pin-icon-file"></span>',
   pinSimple: '<svg class="icon" viewBox="0 0 24 24"><path d="M12 17v5M9 10.76a2 2 0 0 1-1.6-1.93 2 2 0 0 1 1.4-1.9L12 3l3.2 3.93a2 2 0 0 1 1.4 1.9 2 2 0 0 1-1.6 1.93l-3 4.24z"></path></svg>',
   check: '<svg class="icon" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"></path></svg>',
   x: '<svg class="icon" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg>'
@@ -519,6 +519,13 @@ function applyTheme(theme) {
   currentTheme = theme === "dark" ? "dark" : "light";
   document.body.classList.toggle("theme-dark", currentTheme === "dark");
   const isDark = currentTheme === "dark";
+  
+  // Update theme-color meta tag
+  const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+  if (themeColorMeta) {
+    themeColorMeta.setAttribute("content", isDark ? "#0b1220" : "#e9e5de");
+  }
+
   themeMoonIcon.classList.toggle("hidden", isDark);
   themeSunIcon.classList.toggle("hidden", !isDark);
   themeToggleBtn.title = isDark ? t("themeTitleLight") : t("themeTitleDark");

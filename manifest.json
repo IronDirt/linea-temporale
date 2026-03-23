@@ -4,8 +4,8 @@
   "short_name": "Timeline",
   "start_url": ".",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#222222",
+  "background_color": "#e9e5de",
+  "theme_color": "#e9e5de",
   "description": "View and share interactive timelines.",
   "orientation": "any",
   "icons": [
