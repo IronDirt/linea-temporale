@@ -121,7 +121,7 @@
   }
 
   .timeline-item {
-    --timeline-item-width: calc(100vw - 20px);
+    --timeline-item-width: min(calc(100vw - 20px), 480px);
   }
 
   .fab-stack {
@@ -153,8 +153,8 @@
     right: auto;
     top: clamp(96px, 16dvh, 140px);
     transform: translateX(-50%) translateY(0);
-    min-width: min(340px, calc(100vw - 12px));
-    width: min(340px, calc(100vw - 12px));
+    min-width: min(360px, calc(100vw - 10px));
+    width: min(360px, calc(100vw - 10px));
     z-index: 30;
   }
 

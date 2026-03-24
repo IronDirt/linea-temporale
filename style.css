@@ -250,7 +250,7 @@ button:focus:not(:focus-visible),
   aspect-ratio: 1/1;
 }
 
-svg.icon {
+.icon {
   width: 20px;
   height: 20px;
   fill: none;
@@ -261,7 +261,7 @@ svg.icon {
   transition: transform 0.2s ease;
 }
 
-button:hover svg.icon {
+button:hover .icon {
   transform: scale(1.1);
 }
 
@@ -518,6 +518,7 @@ button:hover svg.icon {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  padding-top: 10px;
 }
 
 .timeline-zoom-btn {
@@ -646,11 +647,8 @@ button:hover svg.icon {
 }
 
 .pin-icon-file {
-  background-color: currentColor;
-  -webkit-mask: url("pin-icon.png") no-repeat center;
-  mask: url("pin-icon.png") no-repeat center;
-  -webkit-mask-size: contain;
-  mask-size: contain;
+  background: url("pin-icon.png") no-repeat center;
+  background-size: contain;
   display: inline-block;
   transition: transform 0.2s ease;
 }
@@ -658,6 +656,7 @@ button:hover svg.icon {
 .timeline-pin-btn:hover {
   background: rgba(122, 103, 80, 0.1);
   opacity: 1;
+  transform: translate(-50%, -100%);
 }
 
 .timeline-pin-btn.is-pinned {
@@ -669,7 +668,6 @@ button:hover svg.icon {
 
 .timeline-pin-btn.is-pinned .icon {
   fill: #7a6750;
-  background-color: #7a6750;
   transform: translateY(-1px);
 }
 
@@ -702,7 +700,7 @@ button:hover svg.icon {
   margin-top: 10px;
   margin-left: 0;
   margin-right: auto;
-  width: auto;
+  width: 100%;
   height: auto;
   max-width: 100%;
   max-height: clamp(220px, 42dvh, 520px);
@@ -845,8 +843,8 @@ button:hover svg.icon {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  min-width: min(350px, calc(100vw - 16px));
-  width: min(350px, calc(100vw - 16px));
+  min-width: min(380px, calc(100vw - 16px));
+  width: min(380px, calc(100vw - 16px));
   padding: 16px;
   border-radius: 12px;
   background: #dfdbd2;
@@ -880,14 +878,16 @@ button:hover svg.icon {
 .backup-actions-row {
   display: flex;
   gap: 8px;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   justify-content: flex-start;
   align-items: center;
   padding-top: 2px;
 }
 
-.backup-actions-row #saveOnlineBtn {
-  margin-left: auto;
+.backup-actions-row button {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 10px 12px;
 }
 
 .online-save-panel {

@@ -850,7 +850,7 @@ function renderTimeline() {
 
     item.innerHTML = `
 				<button type="button" class="timeline-pin-btn${isPinned ? " is-pinned" : ""}" data-action="pin" data-index="${originalIndex}" aria-label="${isPinned ? t("pinRemoveLabel") : t("pinAddLabel")}" title="${isPinned ? t("pinRemoveTitle") : t("pinAddTitle")}">
-          ${getIcon("pinSimple")}
+          ${getIcon("pin")}
         </button>
 				<div class="timeline-item-content">
 					<div class="timeline-date">${formattedDate}</div>
@@ -1458,7 +1458,7 @@ function downloadTimelineData() {
   ).trim();
   // Rimuovi caratteri non validi per i nomi file
   title = title.replace(/[^a-zA-Z0-9-_ ]/g, "_");
-  a.download = `Backup_${title}.json`;
+  a.download = `Backup_Timeline_${title}.json`;
   document.body.appendChild(a);
   a.click();
   a.remove();

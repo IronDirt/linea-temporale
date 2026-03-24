@@ -101,6 +101,6 @@ window.__i18n_en = {
   eraAD: "AD",
   eraBCE: "BCE",
   eraCE: "CE",
-  langToggleLabel: "Italiano",
-  langToggleTitle: "Switch to Italian",
+  langToggleLabel: "EN",
+  langToggleTitle: "Switch to English",
 };
